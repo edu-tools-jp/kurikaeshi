@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="くりかえし">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>くりかえし - テスト勉強アプリ</title>
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-dark: #3A7BC8;
+  --success: #34C759;
+  --danger: #FF3B30;
+  --warning: #FF9500;
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --text: #1C1C1E;
+  --text-secondary: #8E8E93;
+  --border: #E5E5EA;
+  --safe-top: env(safe-area-inset-top, 20px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: var(--primary);
+  color: white;
+  padding: calc(var(--safe-top) + 8px) 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Screen container */
+.screen {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* Subject list */
+.list-container {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: calc(80px + var(--safe-bottom));
+}
+
+.list-item {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.1s;
+  position: relative;
+}
+
+.list-item:active {
+  transform: scale(0.98);
+}
+
+.list-item-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.list-item-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.list-item-arrow {
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+.list-item-badge {
+  background: var(--danger);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.delete-btn {
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: right 0.2s;
+}
+
+.list-item.swiped .delete-btn {
+  right: 8px;
+}
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: calc(24px + var(--safe-bottom));
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(74,144,217,0.4);
+  cursor: pointer;
+  z-index: 50;
+}
+
+.fab:active {
+  transform: scale(0.92);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.modal input, .modal select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px;
+  margin-bottom: 12px;
+  -webkit-appearance: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+/* Color options */
+.color-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.color-option {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+}
+
+.color-option.selected {
+  border-color: var(--text);
+}
+
+/* Icon options */
+.icon-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.icon-option {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--card);
+}
+
+.icon-option.selected {
+  border-color: var(--primary);
+  background: rgba(74,144,217,0.1);
+}
+
+/* Problem capture */
+.capture-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 16px;
+}
+
+.capture-preview {
+  width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  border-radius: 12px;
+  display: none;
+}
+
+.capture-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--primary);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: var(--primary);
+}
+
+.capture-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.capture-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.hidden-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Problem thumbnails grid */
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  padding-bottom: calc(80px + var(--safe-bottom));
+}
+
+.problem-thumb {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  cursor: pointer;
+}
+
+.problem-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.problem-thumb-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--success);
+  color: white;
+  font-size: 16px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.problem-thumb.correct .problem-thumb-check {
+  display: flex;
+}
+
+.problem-thumb.correct img {
+  opacity: 0.4;
+}
+
+.problem-thumb-number {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Quiz mode */
+.quiz-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-progress {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.quiz-progress-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.quiz-image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+}
+
+.quiz-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.quiz-actions {
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+  display: flex;
+  gap: 12px;
+}
+
+.quiz-btn {
+  flex: 1;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.quiz-btn-wrong {
+  background: #FFF0F0;
+  color: var(--danger);
+}
+
+.quiz-btn-correct {
+  background: #F0FFF4;
+  color: var(--success);
+}
+
+.quiz-btn-wrong:active {
+  background: #FFE0E0;
+}
+
+.quiz-btn-correct:active {
+  background: #E0FFE8;
+}
+
+/* Results */
+.results-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+}
+
+.results-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 8px solid var(--success);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.results-score {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--success);
+}
+
+.results-total {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.results-message {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.results-detail {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.results-actions button {
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* Empty state */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-state-text {
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg);
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--card);
+  color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  padding: 12px 16px;
+  gap: 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Long press menu */
+.context-menu {
+  position: fixed;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  z-index: 300;
+  overflow: hidden;
+  display: none;
+  min-width: 180px;
+}
+
+.context-menu.active {
+  display: block;
+}
+
+.context-menu-item {
+  padding: 14px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.context-menu-item:last-child {
+  border-bottom: none;
+}
+
+.context-menu-item:active {
+  background: var(--bg);
+}
+
+.context-menu-item.danger {
+  color: var(--danger);
+}
+
+/* Crop overlay */
+.crop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 250;
+  display: none;
+  flex-direction: column;
+}
+
+.crop-overlay.active {
+  display: flex;
+}
+
+.crop-header {
+  padding: calc(var(--safe-top) + 8px) 16px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.crop-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.crop-canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.crop-canvas-container canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.crop-instructions {
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 12px;
+  padding-bottom: calc(12px + var(--safe-bottom));
+  font-size: 14px;
+}
+
+/* Mask overlay */
+.mask-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 260;
+  display: none;
+  flex-direction: column;
+}
+
+.mask-overlay.active {
+  display: flex;
+}
+
+.mask-header {
+  padding: calc(var(--safe-top) + 8px) 16px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.mask-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mask-canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.mask-canvas-container canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.mask-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 16px;
+  color: white;
+}
+
+.mask-size-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.mask-size-btn.active {
+  background: var(--primary);
+}
+
+.mask-instructions {
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 8px 12px;
+  padding-bottom: calc(8px + var(--safe-bottom));
+  font-size: 14px;
+}
+
+/* Quiz mode modal */
+.quiz-mode-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.quiz-mode-btn {
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-mode-btn .qm-icon {
+  font-size: 24px;
+  width: 40px;
+  text-align: center;
+}
+
+.quiz-mode-btn .qm-text {
+  flex: 1;
+}
+
+.quiz-mode-btn .qm-label {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.quiz-mode-btn .qm-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Select mode */
+.problem-thumb-select {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  z-index: 2;
+}
+
+.select-mode .problem-thumb-select {
+  display: flex;
+}
+
+.problem-thumb.selected .problem-thumb-select {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.select-mode .problem-thumb {
+  cursor: pointer;
+}
+
+.select-mode .problem-thumb.selected {
+  outline: 3px solid var(--primary);
+}
+
+.select-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #555;
+  color: white;
+  padding: 12px 16px calc(12px + var(--safe-bottom));
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 50;
+}
+
+.select-bar.active {
+  display: flex;
+}
+
+.select-bar button {
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* Transition */
+.slide-in {
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Screen: Subject List -->
+  <div id="screen-subjects" class="screen active">
+    <div class="header">
+      <h1>📚 くりかえし</h1>
+    </div>
+    <div id="subject-list" class="list-container"></div>
+    <button class="fab" onclick="showAddSubjectModal()">＋</button>
+  </div>
+
+  <!-- Screen: Unit List -->
+  <div id="screen-units" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('subjects')">‹</button>
+      <h1 id="units-title">教科名</h1>
+      <button class="header-btn" onclick="showAddUnitModal()">＋</button>
+    </div>
+    <div id="unit-list" class="list-container"></div>
+  </div>
+
+  <!-- Screen: Problem List -->
+  <div id="screen-problems" class="screen">
+    <div class="header" id="problems-header-normal">
+      <button class="back-btn" onclick="showScreen('units')">‹</button>
+      <h1 id="problems-title">単元名</h1>
+      <button class="header-btn" id="btn-select-mode" onclick="enterSelectMode()" style="font-size:14px">選択</button>
+    </div>
+    <div class="header" id="problems-header-select" style="display:none;background:#555">
+      <button class="back-btn" onclick="exitSelectMode()">✕</button>
+      <h1 id="select-count">0件選択</h1>
+      <button class="header-btn" onclick="toggleSelectAll()" style="font-size:13px">全選択</button>
+      <button class="header-btn" onclick="deleteSelected()" style="font-size:14px;background:rgba(255,59,48,0.3)">🗑</button>
+    </div>
+    <div class="stats-bar" id="problems-stats"></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="setFilter('all', this)">すべて</button>
+      <button class="tab-btn" onclick="setFilter('remaining', this)">未正解</button>
+      <button class="tab-btn" onclick="setFilter('correct', this)">正解済み</button>
+    </div>
+    <div id="problem-grid" class="problem-grid"></div>
+    <div id="problems-empty" class="empty-state" style="display:none">
+      <div class="empty-state-icon">📷</div>
+      <div class="empty-state-text">まだ問題がありません<br>＋ボタンで写真を撮って<br>問題を登録しましょう</div>
+    </div>
+    <button class="fab" id="fab-problems" onclick="startCapture()">📷</button>
+    <button class="fab" id="fab-quiz" style="right:96px;background:var(--warning)" onclick="showQuizModeModal()">▶</button>
+  </div>
+
+  <!-- Screen: Capture -->
+  <div id="screen-capture" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="cancelCapture()">‹</button>
+      <h1>問題を撮影</h1>
+    </div>
+    <div class="capture-area">
+      <input type="file" accept="image/*" id="camera-input" class="hidden-input" onchange="handleCapture(event)">
+      <img id="capture-preview" class="capture-preview">
+      <div id="capture-initial">
+        <p style="color:var(--text-secondary);margin-bottom:20px;text-align:center">問題集の問題を撮影してください<br>1問ずつ撮影するのがおすすめです</p>
+        <button class="capture-btn" onclick="document.getElementById('camera-input').click()">📷</button>
+      </div>
+      <div id="capture-confirm" class="capture-actions" style="display:none;flex-wrap:wrap">
+        <button class="btn-cancel" onclick="retakePhoto()" style="flex:1 1 45%">撮り直す</button>
+        <button class="btn-primary" onclick="saveCapture()" style="flex:1 1 45%">登録する</button>
+        <button class="btn-cancel" onclick="openMaskScreen()" style="flex:1 1 100%;background:#FFE0E0;color:var(--danger)">答えを隠す（白塗り）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Quiz -->
+  <div id="screen-quiz" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="endQuiz()">✕</button>
+      <h1>復習モード</h1>
+    </div>
+    <div class="quiz-container">
+      <div class="quiz-progress">
+        <div class="quiz-progress-bar">
+          <div id="quiz-progress-fill" class="quiz-progress-fill" style="width:0%"></div>
+        </div>
+        <span id="quiz-progress-text" class="quiz-progress-text">1 / 10</span>
+      </div>
+      <div class="quiz-image-container">
+        <img id="quiz-image" class="quiz-image">
+      </div>
+      <div class="quiz-actions">
+        <button class="quiz-btn quiz-btn-wrong" onclick="markAnswer(false)">✕ まちがい</button>
+        <button class="quiz-btn quiz-btn-correct" onclick="markAnswer(true)">◯ 正解</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Results -->
+  <div id="screen-results" class="screen">
+    <div class="header">
+      <h1>結果</h1>
+    </div>
+    <div class="results-container">
+      <div class="results-circle">
+        <div id="results-score" class="results-score">0</div>
+        <div id="results-total" class="results-total">/ 0問</div>
+      </div>
+      <div id="results-message" class="results-message"></div>
+      <div id="results-detail" class="results-detail"></div>
+      <div class="results-actions">
+        <button class="btn-primary" id="btn-retry" onclick="retryWrong()" style="display:none">まちがえた問題をもう一度</button>
+        <button class="btn-cancel" onclick="showScreen('problems')">もどる</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add Subject Modal -->
+<div id="modal-subject" class="modal-overlay" onclick="closeModal(event, 'modal-subject')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 id="modal-subject-title">教科を追加</h2>
+    <input type="text" id="input-subject" placeholder="教科名（例：数学）" maxlength="20">
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:8px">アイコン</p>
+    <div class="icon-options" id="subject-icons"></div>
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:8px">色</p>
+    <div class="color-options" id="subject-colors"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-subject')">キャンセル</button>
+      <button class="btn-primary" onclick="saveSubject()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Unit Modal -->
+<div id="modal-unit" class="modal-overlay" onclick="closeModal(event, 'modal-unit')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>単元を追加</h2>
+    <input type="text" id="input-unit" placeholder="単元名（例：一次方程式）" maxlength="30">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-unit')">キャンセル</button>
+      <button class="btn-primary" onclick="saveUnit()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="modal-confirm" class="modal-overlay">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 id="confirm-title">確認</h2>
+    <p id="confirm-message" style="margin-bottom:16px;color:var(--text-secondary)"></p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-confirm')">キャンセル</button>
+      <button class="btn-danger" id="confirm-btn" onclick="">削除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mask Overlay -->
+<div id="mask-overlay" class="mask-overlay">
+  <div class="mask-header">
+    <button onclick="cancelMask()">キャンセル</button>
+    <span style="font-weight:600">答えを隠す</span>
+    <button onclick="applyMask()">完了</button>
+  </div>
+  <div class="mask-canvas-container" id="mask-container">
+    <canvas id="mask-canvas"></canvas>
+  </div>
+  <div class="mask-toolbar">
+    <span style="font-size:13px">ペンの太さ：</span>
+    <button class="mask-size-btn" onclick="setMaskSize(20,this)">細</button>
+    <button class="mask-size-btn active" onclick="setMaskSize(40,this)">中</button>
+    <button class="mask-size-btn" onclick="setMaskSize(70,this)">太</button>
+    <button class="mask-size-btn" onclick="undoMask()" style="margin-left:12px">↩</button>
+  </div>
+  <div class="mask-instructions">指でなぞって答えを白く塗りつぶします</div>
+</div>
+
+<!-- Quiz Mode Modal -->
+<div id="modal-quiz-mode" class="modal-overlay" onclick="closeModal(event, 'modal-quiz-mode')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>復習モード</h2>
+    <div class="quiz-mode-modal">
+      <button class="quiz-mode-btn" style="background:#FFF0F0" onclick="hideModal('modal-quiz-mode');startQuizMode('remaining')">
+        <span class="qm-icon">🔴</span>
+        <div class="qm-text">
+          <div class="qm-label">未正解の問題だけ</div>
+          <div class="qm-desc" id="qm-remaining-count"></div>
+        </div>
+      </button>
+      <button class="quiz-mode-btn" style="background:#F0F0FF" onclick="hideModal('modal-quiz-mode');startQuizMode('all')">
+        <span class="qm-icon">📋</span>
+        <div class="qm-text">
+          <div class="qm-label">すべての問題</div>
+          <div class="qm-desc" id="qm-all-count"></div>
+        </div>
+      </button>
+    </div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn-cancel" onclick="hideModal('modal-quiz-mode')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- Crop Overlay -->
+<div id="crop-overlay" class="crop-overlay">
+  <div class="crop-header">
+    <button onclick="cancelCrop()">キャンセル</button>
+    <span style="font-weight:600">トリミング</span>
+    <button onclick="applyCrop()">完了</button>
+  </div>
+  <div class="crop-canvas-container" id="crop-container">
+    <canvas id="crop-canvas"></canvas>
+  </div>
+  <div class="crop-instructions">指でドラッグして必要な部分を選択してください</div>
+</div>
+
+<!-- Context Menu -->
+<div id="context-menu" class="context-menu"></div>
+
+<script>
+// ==================== Database ====================
+const DB_NAME = 'kurikaeshi';
+const DB_VERSION = 1;
+let db;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('subjects')) {
+        d.createObjectStore('subjects', { keyPath: 'id' });
+      }
+      if (!d.objectStoreNames.contains('units')) {
+        const us = d.createObjectStore('units', { keyPath: 'id' });
+        us.createIndex('subjectId', 'subjectId');
+      }
+      if (!d.objectStoreNames.contains('problems')) {
+        const ps = d.createObjectStore('problems', { keyPath: 'id' });
+        ps.createIndex('unitId', 'unitId');
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+function dbGetAll(store) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGetByIndex(store, index, value) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).index(index).getAll(value);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbPut(store, data) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).put(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function dbDelete(store, id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// ==================== State ====================
+let currentSubject = null;
+let currentUnit = null;
+let currentFilter = 'all';
+let quizProblems = [];
+let quizIndex = 0;
+let quizResults = [];
+let capturedImages = [];
+let selectMode = false;
+let selectedProblems = new Set();
+let cropImage = null;
+let cropRect = { x: 0, y: 0, w: 0, h: 0 };
+let cropDragging = false;
+let cropStartX = 0, cropStartY = 0;
+
+const ICONS = ['📐','🔬','📖','🌍','🎵','💻','🏃','🎨','✏️','📝','🧪','📊','🇬🇧','🇯🇵','⚡','🧮'];
+const COLORS = ['#4A90D9','#34C759','#FF9500','#FF3B30','#AF52DE','#5AC8FA','#FF2D55','#8E8E93','#FFD60A','#30D158'];
+
+let selectedIcon = ICONS[0];
+let selectedColor = COLORS[0];
+
+// ==================== Navigation ====================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById('screen-' + name);
+  screen.classList.add('active');
+  screen.classList.add('slide-in');
+  setTimeout(() => screen.classList.remove('slide-in'), 250);
+
+  if (name === 'subjects') renderSubjects();
+  else if (name === 'units') renderUnits();
+  else if (name === 'problems') renderProblems();
+}
+
+// ==================== Subjects ====================
+function renderSubjects() {
+  const container = document.getElementById('subject-list');
+  dbGetAll('subjects').then(async subjects => {
+    subjects.sort((a, b) => a.order - b.order);
+    if (subjects.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📚</div>
+          <div class="empty-state-text">教科を追加して<br>テスト勉強を始めましょう！</div>
+        </div>`;
+      return;
+    }
+    let html = '';
+    for (const s of subjects) {
+      const units = await dbGetByIndex('units', 'subjectId', s.id);
+      let totalProblems = 0;
+      let remaining = 0;
+      for (const u of units) {
+        const probs = await dbGetByIndex('problems', 'unitId', u.id);
+        totalProblems += probs.length;
+        remaining += probs.filter(p => !p.correct).length;
+      }
+      html += `
+        <div class="list-item" onclick="openSubject('${s.id}')" oncontextmenu="showSubjectMenu(event,'${s.id}')">
+          <div class="list-item-icon" style="background:${s.color}20;color:${s.color}">${s.icon}</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${esc(s.name)}</div>
+            <div class="list-item-subtitle">${units.length}単元 · ${totalProblems}問</div>
+          </div>
+          ${remaining > 0 ? `<span class="list-item-badge">${remaining}</span>` : ''}
+          <span class="list-item-arrow">›</span>
+        </div>`;
+    }
+    container.innerHTML = html;
+  });
+}
+
+function showAddSubjectModal() {
+  document.getElementById('input-subject').value = '';
+  selectedIcon = ICONS[0];
+  selectedColor = COLORS[0];
+  renderIconOptions();
+  renderColorOptions();
+  document.getElementById('modal-subject').classList.add('active');
+  setTimeout(() => document.getElementById('input-subject').focus(), 300);
+}
+
+function renderIconOptions() {
+  const c = document.getElementById('subject-icons');
+  c.innerHTML = ICONS.map(icon =>
+    `<div class="icon-option ${icon === selectedIcon ? 'selected' : ''}" onclick="selectIcon('${icon}', this)">${icon}</div>`
+  ).join('');
+}
+
+function renderColorOptions() {
+  const c = document.getElementById('subject-colors');
+  c.innerHTML = COLORS.map(color =>
+    `<div class="color-option ${color === selectedColor ? 'selected' : ''}" style="background:${color}" onclick="selectColor('${color}', this)"></div>`
+  ).join('');
+}
+
+function selectIcon(icon, el) {
+  selectedIcon = icon;
+  document.querySelectorAll('#subject-icons .icon-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectColor(color, el) {
+  selectedColor = color;
+  document.querySelectorAll('#subject-colors .color-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function saveSubject() {
+  const name = document.getElementById('input-subject').value.trim();
+  if (!name) return;
+  const subjects = await dbGetAll('subjects');
+  await dbPut('subjects', {
+    id: 'sub_' + Date.now(),
+    name,
+    icon: selectedIcon,
+    color: selectedColor,
+    order: subjects.length,
+    createdAt: Date.now()
+  });
+  hideModal('modal-subject');
+  renderSubjects();
+}
+
+async function openSubject(id) {
+  const subjects = await dbGetAll('subjects');
+  currentSubject = subjects.find(s => s.id === id);
+  document.getElementById('units-title').textContent = currentSubject.icon + ' ' + currentSubject.name;
+  showScreen('units');
+}
+
+function showSubjectMenu(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  showContextMenu(e, [
+    { label: '🗑 削除', danger: true, action: () => confirmDeleteSubject(id) }
+  ]);
+}
+
+function confirmDeleteSubject(id) {
+  dbGetAll('subjects').then(subjects => {
+    const s = subjects.find(x => x.id === id);
+    document.getElementById('confirm-title').textContent = '教科を削除';
+    document.getElementById('confirm-message').textContent = `「${s.name}」を削除しますか？この教科の単元と問題もすべて削除されます。`;
+    document.getElementById('confirm-btn').onclick = () => deleteSubject(id);
+    document.getElementById('modal-confirm').classList.add('active');
+  });
+}
+
+async function deleteSubject(id) {
+  const units = await dbGetByIndex('units', 'subjectId', id);
+  for (const u of units) {
+    const probs = await dbGetByIndex('problems', 'unitId', u.id);
+    for (const p of probs) await dbDelete('problems', p.id);
+    await dbDelete('units', u.id);
+  }
+  await dbDelete('subjects', id);
+  hideModal('modal-confirm');
+  renderSubjects();
+}
+
+// ==================== Units ====================
+async function renderUnits() {
+  const container = document.getElementById('unit-list');
+  const units = await dbGetByIndex('units', 'subjectId', currentSubject.id);
+  units.sort((a, b) => a.order - b.order);
+
+  if (units.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📁</div>
+        <div class="empty-state-text">単元を追加しましょう<br>右上の＋ボタンをタップ</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  for (const u of units) {
+    const probs = await dbGetByIndex('problems', 'unitId', u.id);
+    const remaining = probs.filter(p => !p.correct).length;
+    const total = probs.length;
+    html += `
+      <div class="list-item" onclick="openUnit('${u.id}')" oncontextmenu="showUnitMenu(event,'${u.id}')">
+        <div class="list-item-icon" style="background:${currentSubject.color}20;color:${currentSubject.color}">📝</div>
+        <div class="list-item-content">
+          <div class="list-item-title">${esc(u.name)}</div>
+          <div class="list-item-subtitle">${total}問${total > 0 ? ` · 正解率 ${Math.round(((total - remaining) / total) * 100)}%` : ''}</div>
+        </div>
+        ${remaining > 0 ? `<span class="list-item-badge">${remaining}</span>` : total > 0 ? '<span style="color:var(--success);font-size:20px">✓</span>' : ''}
+        <span class="list-item-arrow">›</span>
+      </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function showAddUnitModal() {
+  document.getElementById('input-unit').value = '';
+  document.getElementById('modal-unit').classList.add('active');
+  setTimeout(() => document.getElementById('input-unit').focus(), 300);
+}
+
+async function saveUnit() {
+  const name = document.getElementById('input-unit').value.trim();
+  if (!name) return;
+  const units = await dbGetByIndex('units', 'subjectId', currentSubject.id);
+  await dbPut('units', {
+    id: 'unit_' + Date.now(),
+    subjectId: currentSubject.id,
+    name,
+    order: units.length,
+    createdAt: Date.now()
+  });
+  hideModal('modal-unit');
+  renderUnits();
+}
+
+async function openUnit(id) {
+  const units = await dbGetByIndex('units', 'subjectId', currentSubject.id);
+  currentUnit = units.find(u => u.id === id);
+  document.getElementById('problems-title').textContent = currentUnit.name;
+  currentFilter = 'all';
+  showScreen('problems');
+}
+
+function showUnitMenu(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  showContextMenu(e, [
+    { label: '↩ 正解をリセット', action: () => resetUnit(id) },
+    { label: '🗑 削除', danger: true, action: () => confirmDeleteUnit(id) }
+  ]);
+}
+
+async function resetUnit(id) {
+  const probs = await dbGetByIndex('problems', 'unitId', id);
+  for (const p of probs) {
+    p.correct = false;
+    await dbPut('problems', p);
+  }
+  renderUnits();
+}
+
+function confirmDeleteUnit(id) {
+  dbGetByIndex('units', 'subjectId', currentSubject.id).then(units => {
+    const u = units.find(x => x.id === id);
+    document.getElementById('confirm-title').textContent = '単元を削除';
+    document.getElementById('confirm-message').textContent = `「${u.name}」を削除しますか？この単元の問題もすべて削除されます。`;
+    document.getElementById('confirm-btn').onclick = () => deleteUnit(id);
+    document.getElementById('modal-confirm').classList.add('active');
+  });
+}
+
+async function deleteUnit(id) {
+  const probs = await dbGetByIndex('problems', 'unitId', id);
+  for (const p of probs) await dbDelete('problems', p.id);
+  await dbDelete('units', id);
+  hideModal('modal-confirm');
+  renderUnits();
+}
+
+// ==================== Problems ====================
+async function renderProblems() {
+  const grid = document.getElementById('problem-grid');
+  const empty = document.getElementById('problems-empty');
+  const stats = document.getElementById('problems-stats');
+
+  let probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  probs.sort((a, b) => a.order - b.order);
+
+  const total = probs.length;
+  const correct = probs.filter(p => p.correct).length;
+  const remaining = total - correct;
+
+  stats.innerHTML = `
+    <div class="stat-item"><div class="stat-value">${total}</div><div class="stat-label">全問題</div></div>
+    <div class="stat-item"><div class="stat-value" style="color:var(--success)">${correct}</div><div class="stat-label">正解</div></div>
+    <div class="stat-item"><div class="stat-value" style="color:var(--danger)">${remaining}</div><div class="stat-label">未正解</div></div>
+    <div class="stat-item"><div class="stat-value">${total > 0 ? Math.round((correct / total) * 100) : 0}%</div><div class="stat-label">正解率</div></div>`;
+
+  // Filter
+  if (currentFilter === 'remaining') probs = probs.filter(p => !p.correct);
+  else if (currentFilter === 'correct') probs = probs.filter(p => p.correct);
+
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && currentFilter === 'all') || (i === 1 && currentFilter === 'remaining') || (i === 2 && currentFilter === 'correct'));
+  });
+
+  // Show/hide quiz button — show whenever there are problems
+  document.getElementById('fab-quiz').style.display = total > 0 ? 'flex' : 'none';
+
+  if (total === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'flex';
+    document.getElementById('btn-select-mode').style.display = 'none';
+    if (selectMode) exitSelectMode();
+    return;
+  }
+
+  empty.style.display = 'none';
+  document.getElementById('btn-select-mode').style.display = '';
+  grid.className = 'problem-grid' + (selectMode ? ' select-mode' : '');
+  grid.innerHTML = probs.map((p, i) => `
+    <div class="problem-thumb ${p.correct ? 'correct' : ''} ${selectedProblems.has(p.id) ? 'selected' : ''}" onclick="${selectMode ? `toggleSelect('${p.id}')` : `viewProblem('${p.id}')`}" oncontextmenu="showProblemMenu(event,'${p.id}')">
+      <img src="${p.imageData}" alt="問題${p.order + 1}" loading="lazy">
+      <div class="problem-thumb-check">✓</div>
+      <div class="problem-thumb-select">${selectedProblems.has(p.id) ? '✓' : ''}</div>
+      <div class="problem-thumb-number">${p.order + 1}</div>
+    </div>`
+  ).join('');
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  renderProblems();
+}
+
+function enterSelectMode() {
+  selectMode = true;
+  selectedProblems.clear();
+  document.getElementById('problems-header-normal').style.display = 'none';
+  document.getElementById('problems-header-select').style.display = 'flex';
+  document.getElementById('fab-problems').style.display = 'none';
+  document.getElementById('fab-quiz').style.display = 'none';
+  updateSelectCount();
+  renderProblems();
+}
+
+function exitSelectMode() {
+  selectMode = false;
+  selectedProblems.clear();
+  document.getElementById('problems-header-normal').style.display = 'flex';
+  document.getElementById('problems-header-select').style.display = 'none';
+  document.getElementById('fab-problems').style.display = '';
+  renderProblems();
+}
+
+function toggleSelect(id) {
+  if (selectedProblems.has(id)) {
+    selectedProblems.delete(id);
+  } else {
+    selectedProblems.add(id);
+  }
+  updateSelectCount();
+  renderProblems();
+}
+
+async function toggleSelectAll() {
+  let probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  if (currentFilter === 'remaining') probs = probs.filter(p => !p.correct);
+  else if (currentFilter === 'correct') probs = probs.filter(p => p.correct);
+
+  if (selectedProblems.size === probs.length) {
+    selectedProblems.clear();
+  } else {
+    probs.forEach(p => selectedProblems.add(p.id));
+  }
+  updateSelectCount();
+  renderProblems();
+}
+
+function updateSelectCount() {
+  document.getElementById('select-count').textContent = selectedProblems.size + '件選択';
+}
+
+async function deleteSelected() {
+  if (selectedProblems.size === 0) return;
+  document.getElementById('confirm-title').textContent = '問題を削除';
+  document.getElementById('confirm-message').textContent = `選択した${selectedProblems.size}件の問題を削除しますか？`;
+  document.getElementById('confirm-btn').onclick = async () => {
+    for (const id of selectedProblems) {
+      await dbDelete('problems', id);
+    }
+    hideModal('modal-confirm');
+    exitSelectMode();
+  };
+  document.getElementById('modal-confirm').classList.add('active');
+}
+
+function showProblemMenu(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  dbGetByIndex('problems', 'unitId', currentUnit.id).then(probs => {
+    const p = probs.find(x => x.id === id);
+    const items = [];
+    if (p.correct) {
+      items.push({ label: '↩ 未正解にもどす', action: () => toggleCorrect(id, false) });
+    } else {
+      items.push({ label: '✓ 正解にする', action: () => toggleCorrect(id, true) });
+    }
+    items.push({ label: '🗑 削除', danger: true, action: () => confirmDeleteProblem(id) });
+    showContextMenu(e, items);
+  });
+}
+
+async function toggleCorrect(id, correct) {
+  const probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  const p = probs.find(x => x.id === id);
+  p.correct = correct;
+  await dbPut('problems', p);
+  renderProblems();
+}
+
+function confirmDeleteProblem(id) {
+  document.getElementById('confirm-title').textContent = '問題を削除';
+  document.getElementById('confirm-message').textContent = 'この問題を削除しますか？';
+  document.getElementById('confirm-btn').onclick = () => deleteProblem(id);
+  document.getElementById('modal-confirm').classList.add('active');
+}
+
+async function deleteProblem(id) {
+  await dbDelete('problems', id);
+  hideModal('modal-confirm');
+  renderProblems();
+}
+
+function viewProblem(id) {
+  dbGetByIndex('problems', 'unitId', currentUnit.id).then(probs => {
+    const p = probs.find(x => x.id === id);
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;';
+    const img = document.createElement('img');
+    img.src = p.imageData;
+    img.style.cssText = 'max-width:100%;max-height:80%;object-fit:contain;border-radius:8px;';
+    overlay.appendChild(img);
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'margin-top:16px;display:flex;gap:12px;';
+
+    if (p.correct) {
+      const resetBtn = document.createElement('button');
+      resetBtn.textContent = '↩ 未正解にもどす';
+      resetBtn.style.cssText = 'background:var(--warning);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;';
+      resetBtn.onclick = async (e) => {
+        e.stopPropagation();
+        p.correct = false;
+        await dbPut('problems', p);
+        overlay.remove();
+        renderProblems();
+      };
+      btnRow.appendChild(resetBtn);
+    }
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '閉じる';
+    closeBtn.style.cssText = 'background:rgba(255,255,255,0.2);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;';
+    closeBtn.onclick = () => overlay.remove();
+    btnRow.appendChild(closeBtn);
+
+    overlay.appendChild(btnRow);
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    document.body.appendChild(overlay);
+  });
+}
+
+// ==================== Capture ====================
+function startCapture() {
+  capturedImages = [];
+  document.getElementById('capture-preview').style.display = 'none';
+  document.getElementById('capture-initial').style.display = 'block';
+  document.getElementById('capture-confirm').style.display = 'none';
+  document.getElementById('camera-input').value = '';
+  showScreen('capture');
+}
+
+function loadImageFromFile(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleCapture(e) {
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
+
+  loadImageFromFile(files[0]).then(img => {
+    openCropScreen(img);
+  });
+}
+
+function resizeImage(img) {
+  const canvas = document.createElement('canvas');
+  const maxSize = 1200;
+  let w = img.width, h = img.height;
+  if (w > maxSize || h > maxSize) {
+    if (w > h) { h = h * maxSize / w; w = maxSize; }
+    else { w = w * maxSize / h; h = maxSize; }
+  }
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', 0.8);
+}
+
+// ==================== Crop ====================
+function openCropScreen(img) {
+  cropImage = img;
+  const overlay = document.getElementById('crop-overlay');
+  const canvas = document.getElementById('crop-canvas');
+  const container = document.getElementById('crop-container');
+  overlay.classList.add('active');
+
+  requestAnimationFrame(() => {
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const scale = Math.min(cw / img.width, ch / img.height);
+    canvas.width = Math.floor(img.width * scale);
+    canvas.height = Math.floor(img.height * scale);
+    canvas._scale = scale;
+
+    cropRect = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+    drawCrop();
+  });
+}
+
+function drawCrop() {
+  const canvas = document.getElementById('crop-canvas');
+  const ctx = canvas.getContext('2d');
+
+  ctx.drawImage(cropImage, 0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const r = cropRect;
+  const x = Math.min(r.x, r.x + r.w);
+  const y = Math.min(r.y, r.y + r.h);
+  const w = Math.abs(r.w);
+  const h = Math.abs(r.h);
+
+  ctx.clearRect(x, y, w, h);
+  ctx.drawImage(cropImage,
+    x / canvas._scale, y / canvas._scale, w / canvas._scale, h / canvas._scale,
+    x, y, w, h);
+
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, w, h);
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 1;
+  const tw = w / 3, th = h / 3;
+  for (let i = 1; i <= 2; i++) {
+    ctx.beginPath();
+    ctx.moveTo(x + tw * i, y);
+    ctx.lineTo(x + tw * i, y + h);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y + th * i);
+    ctx.lineTo(x + w, y + th * i);
+    ctx.stroke();
+  }
+
+  const cornerSize = 20;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 3;
+  const corners = [
+    [x, y], [x + w, y], [x, y + h], [x + w, y + h]
+  ];
+  corners.forEach(([cx, cy]) => {
+    const dx = cx === x ? 1 : -1;
+    const dy = cy === y ? 1 : -1;
+    ctx.beginPath();
+    ctx.moveTo(cx + cornerSize * dx, cy);
+    ctx.lineTo(cx, cy);
+    ctx.lineTo(cx, cy + cornerSize * dy);
+    ctx.stroke();
+  });
+}
+
+function getCropPos(e) {
+  const canvas = document.getElementById('crop-canvas');
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top
+  };
+}
+
+(function setupCropEvents() {
+  const canvas = document.getElementById('crop-canvas');
+
+  function onStart(e) {
+    e.preventDefault();
+    const pos = getCropPos(e);
+    cropStartX = pos.x;
+    cropStartY = pos.y;
+    cropRect.x = pos.x;
+    cropRect.y = pos.y;
+    cropRect.w = 0;
+    cropRect.h = 0;
+    cropDragging = true;
+  }
+
+  function onMove(e) {
+    if (!cropDragging) return;
+    e.preventDefault();
+    const pos = getCropPos(e);
+    cropRect.w = pos.x - cropStartX;
+    cropRect.h = pos.y - cropStartY;
+    drawCrop();
+  }
+
+  function onEnd(e) {
+    if (!cropDragging) return;
+    cropDragging = false;
+    if (Math.abs(cropRect.w) < 10 || Math.abs(cropRect.h) < 10) {
+      cropRect = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+      drawCrop();
+    }
+  }
+
+  canvas.addEventListener('mousedown', onStart);
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('mouseup', onEnd);
+  canvas.addEventListener('touchstart', onStart, { passive: false });
+  canvas.addEventListener('touchmove', onMove, { passive: false });
+  canvas.addEventListener('touchend', onEnd);
+})();
+
+function applyCrop() {
+  const canvas = document.getElementById('crop-canvas');
+  const scale = canvas._scale;
+
+  let sx = Math.min(cropRect.x, cropRect.x + cropRect.w) / scale;
+  let sy = Math.min(cropRect.y, cropRect.y + cropRect.h) / scale;
+  let sw = Math.abs(cropRect.w) / scale;
+  let sh = Math.abs(cropRect.h) / scale;
+
+  sx = Math.max(0, sx);
+  sy = Math.max(0, sy);
+  sw = Math.min(sw, cropImage.width - sx);
+  sh = Math.min(sh, cropImage.height - sy);
+
+  const out = document.createElement('canvas');
+  const maxSize = 1200;
+  let ow = sw, oh = sh;
+  if (ow > maxSize || oh > maxSize) {
+    if (ow > oh) { oh = oh * maxSize / ow; ow = maxSize; }
+    else { ow = ow * maxSize / oh; oh = maxSize; }
+  }
+  out.width = Math.round(ow);
+  out.height = Math.round(oh);
+  out.getContext('2d').drawImage(cropImage, sx, sy, sw, sh, 0, 0, out.width, out.height);
+  const dataUrl = out.toDataURL('image/jpeg', 0.85);
+
+  capturedImages = [dataUrl];
+  document.getElementById('crop-overlay').classList.remove('active');
+
+  document.getElementById('capture-preview').src = dataUrl;
+  document.getElementById('capture-preview').style.display = 'block';
+  document.getElementById('capture-initial').style.display = 'none';
+  document.getElementById('capture-confirm').style.display = 'flex';
+}
+
+function cancelCrop() {
+  document.getElementById('crop-overlay').classList.remove('active');
+  cropImage = null;
+}
+
+function retakePhoto() {
+  capturedImages = [];
+  document.getElementById('capture-preview').style.display = 'none';
+  document.getElementById('capture-initial').style.display = 'block';
+  document.getElementById('capture-confirm').style.display = 'none';
+  document.getElementById('camera-input').value = '';
+  document.getElementById('camera-input').click();
+}
+
+async function saveCapture() {
+  if (capturedImages.length === 0) return;
+  const probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  for (const img of capturedImages) {
+    await dbPut('problems', {
+      id: 'prob_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      unitId: currentUnit.id,
+      imageData: img,
+      correct: false,
+      order: probs.length + capturedImages.indexOf(img),
+      createdAt: Date.now()
+    });
+  }
+  showScreen('problems');
+}
+
+function cancelCapture() {
+  capturedImages = [];
+  showScreen('problems');
+}
+
+// ==================== Mask ====================
+let maskCanvas, maskCtx, maskBaseImage, maskHistory = [], maskBrushSize = 40, maskDrawing = false;
+
+function openMaskScreen() {
+  if (capturedImages.length === 0) return;
+  const overlay = document.getElementById('mask-overlay');
+  maskCanvas = document.getElementById('mask-canvas');
+  maskCtx = maskCanvas.getContext('2d');
+  const container = document.getElementById('mask-container');
+  overlay.classList.add('active');
+
+  const img = new Image();
+  img.onload = () => {
+    maskBaseImage = img;
+    requestAnimationFrame(() => {
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      const scale = Math.min(cw / img.width, ch / img.height);
+      maskCanvas.width = Math.floor(img.width * scale);
+      maskCanvas.height = Math.floor(img.height * scale);
+      maskCanvas._scale = scale;
+      maskCtx.drawImage(img, 0, 0, maskCanvas.width, maskCanvas.height);
+      maskHistory = [maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height)];
+    });
+  };
+  img.src = capturedImages[0];
+}
+
+function setMaskSize(size, btn) {
+  maskBrushSize = size;
+  document.querySelectorAll('.mask-size-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function undoMask() {
+  if (maskHistory.length <= 1) return;
+  maskHistory.pop();
+  maskCtx.putImageData(maskHistory[maskHistory.length - 1], 0, 0);
+}
+
+function getMaskPos(e) {
+  const rect = maskCanvas.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return {
+    x: (touch.clientX - rect.left) * (maskCanvas.width / rect.width),
+    y: (touch.clientY - rect.top) * (maskCanvas.height / rect.height)
+  };
+}
+
+function maskDraw(pos) {
+  maskCtx.fillStyle = '#FFFFFF';
+  maskCtx.beginPath();
+  maskCtx.arc(pos.x, pos.y, maskBrushSize / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+}
+
+(function setupMaskEvents() {
+  const canvas = document.getElementById('mask-canvas');
+  let lastPos = null;
+
+  function onStart(e) {
+    e.preventDefault();
+    maskDrawing = true;
+    lastPos = getMaskPos(e);
+    maskDraw(lastPos);
+  }
+
+  function onMove(e) {
+    if (!maskDrawing) return;
+    e.preventDefault();
+    const pos = getMaskPos(e);
+    const dx = pos.x - lastPos.x;
+    const dy = pos.y - lastPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const steps = Math.max(1, Math.floor(dist / (maskBrushSize / 4)));
+    for (let i = 1; i <= steps; i++) {
+      maskDraw({
+        x: lastPos.x + dx * (i / steps),
+        y: lastPos.y + dy * (i / steps)
+      });
+    }
+    lastPos = pos;
+  }
+
+  function onEnd() {
+    if (!maskDrawing) return;
+    maskDrawing = false;
+    maskHistory.push(maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height));
+    lastPos = null;
+  }
+
+  canvas.addEventListener('mousedown', onStart);
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('mouseup', onEnd);
+  canvas.addEventListener('touchstart', onStart, { passive: false });
+  canvas.addEventListener('touchmove', onMove, { passive: false });
+  canvas.addEventListener('touchend', onEnd);
+})();
+
+function applyMask() {
+  const scale = maskCanvas._scale;
+  const out = document.createElement('canvas');
+  out.width = maskBaseImage.width;
+  out.height = maskBaseImage.height;
+  const outCtx = out.getContext('2d');
+  outCtx.drawImage(maskCanvas, 0, 0, maskCanvas.width, maskCanvas.height, 0, 0, out.width, out.height);
+  const dataUrl = out.toDataURL('image/jpeg', 0.85);
+  capturedImages = [dataUrl];
+  document.getElementById('capture-preview').src = dataUrl;
+  document.getElementById('mask-overlay').classList.remove('active');
+  maskHistory = [];
+}
+
+function cancelMask() {
+  document.getElementById('mask-overlay').classList.remove('active');
+  maskHistory = [];
+}
+
+// ==================== Quiz ====================
+async function showQuizModeModal() {
+  const probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  const remaining = probs.filter(p => !p.correct).length;
+  const total = probs.length;
+  document.getElementById('qm-remaining-count').textContent = remaining + '問';
+  document.getElementById('qm-all-count').textContent = total + '問';
+  document.getElementById('modal-quiz-mode').classList.add('active');
+}
+
+async function startQuizMode(mode) {
+  let probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  if (mode === 'remaining') {
+    probs = probs.filter(p => !p.correct);
+  }
+  if (probs.length === 0) return;
+
+  for (let i = probs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [probs[i], probs[j]] = [probs[j], probs[i]];
+  }
+
+  quizProblems = probs;
+  quizIndex = 0;
+  quizResults = [];
+  showScreen('quiz');
+  showQuizProblem();
+}
+
+async function startQuiz() {
+  let probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  probs = probs.filter(p => !p.correct);
+  if (probs.length === 0) return;
+
+  for (let i = probs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [probs[i], probs[j]] = [probs[j], probs[i]];
+  }
+
+  quizProblems = probs;
+  quizIndex = 0;
+  quizResults = [];
+  showScreen('quiz');
+  showQuizProblem();
+}
+
+function showQuizProblem() {
+  if (quizIndex >= quizProblems.length) {
+    showResults();
+    return;
+  }
+  const p = quizProblems[quizIndex];
+  document.getElementById('quiz-image').src = p.imageData;
+  document.getElementById('quiz-progress-fill').style.width = (quizIndex / quizProblems.length * 100) + '%';
+  document.getElementById('quiz-progress-text').textContent = `${quizIndex + 1} / ${quizProblems.length}`;
+}
+
+async function markAnswer(correct) {
+  const p = quizProblems[quizIndex];
+  quizResults.push({ id: p.id, correct });
+
+  if (correct) {
+    p.correct = true;
+    await dbPut('problems', p);
+  }
+
+  quizIndex++;
+  showQuizProblem();
+}
+
+function endQuiz() {
+  showScreen('problems');
+}
+
+function showResults() {
+  const total = quizResults.length;
+  const correct = quizResults.filter(r => r.correct).length;
+  const wrong = total - correct;
+  const pct = Math.round((correct / total) * 100);
+
+  document.getElementById('results-score').textContent = correct;
+  document.getElementById('results-total').textContent = '/ ' + total + '問';
+
+  const circle = document.querySelector('.results-circle');
+  if (pct === 100) {
+    circle.style.borderColor = 'var(--success)';
+    document.getElementById('results-score').style.color = 'var(--success)';
+    document.getElementById('results-message').textContent = '🎉 パーフェクト！';
+    document.getElementById('results-detail').textContent = 'すべて正解しました！すばらしい！';
+  } else if (pct >= 70) {
+    circle.style.borderColor = 'var(--primary)';
+    document.getElementById('results-score').style.color = 'var(--primary)';
+    document.getElementById('results-message').textContent = '👍 よくできました！';
+    document.getElementById('results-detail').textContent = `あと${wrong}問、もう少しがんばろう！`;
+  } else {
+    circle.style.borderColor = 'var(--warning)';
+    document.getElementById('results-score').style.color = 'var(--warning)';
+    document.getElementById('results-message').textContent = '💪 もう一回やろう！';
+    document.getElementById('results-detail').textContent = `${wrong}問まちがい。くりかえし復習しよう！`;
+  }
+
+  const retryBtn = document.getElementById('btn-retry');
+  if (wrong > 0) {
+    retryBtn.style.display = 'block';
+    retryBtn.textContent = `まちがえた ${wrong}問をもう一度`;
+  } else {
+    retryBtn.style.display = 'none';
+  }
+
+  showScreen('results');
+}
+
+async function retryWrong() {
+  let probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  probs = probs.filter(p => !p.correct);
+  if (probs.length === 0) {
+    showScreen('problems');
+    return;
+  }
+  for (let i = probs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [probs[i], probs[j]] = [probs[j], probs[i]];
+  }
+  quizProblems = probs;
+  quizIndex = 0;
+  quizResults = [];
+  showScreen('quiz');
+  showQuizProblem();
+}
+
+// ==================== UI Helpers ====================
+function hideModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function closeModal(e, id) {
+  if (e.target === document.getElementById(id)) hideModal(id);
+}
+
+function showContextMenu(e, items) {
+  const menu = document.getElementById('context-menu');
+  menu.innerHTML = items.map(item =>
+    `<div class="context-menu-item ${item.danger ? 'danger' : ''}">${item.label}</div>`
+  ).join('');
+
+  const menuItems = menu.querySelectorAll('.context-menu-item');
+  menuItems.forEach((el, i) => {
+    el.onclick = () => {
+      menu.classList.remove('active');
+      items[i].action();
+    };
+  });
+
+  const x = Math.min(e.clientX || e.touches?.[0]?.clientX || 100, window.innerWidth - 200);
+  const y = Math.min(e.clientY || e.touches?.[0]?.clientY || 100, window.innerHeight - items.length * 50);
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  menu.classList.add('active');
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('context-menu').classList.remove('active');
+});
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Handle Enter key in modals
+document.getElementById('input-subject').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveSubject();
+});
+document.getElementById('input-unit').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveUnit();
+});
+
+// ==================== Init ====================
+openDB().then(() => {
+  renderSubjects();
+});
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
