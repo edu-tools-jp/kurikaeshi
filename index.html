@@ -1138,10 +1138,10 @@ body {
         <span style="color:var(--text-secondary)">すべて正解するまでくりかえし解きましょう。テスト前には「すべての問題」モードで総復習もできます。</span>
       </div>
     </div>
-    <label style="display:flex;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--text-secondary);cursor:pointer">
-      <input type="checkbox" id="tutorial-hide-check" style="width:18px;height:18px">
-      今後は表示しない
-    </label>
+    <div onclick="var c=document.getElementById('tutorial-hide-check');c.checked=!c.checked;" style="display:flex;align-items:center;gap:10px;margin:12px 0;padding:12px;font-size:15px;color:var(--text-secondary);cursor:pointer;border:1px solid var(--border);border-radius:8px">
+      <input type="checkbox" id="tutorial-hide-check" onclick="event.stopPropagation()" style="width:24px;height:24px;min-width:24px;cursor:pointer">
+      <span>今後は表示しない</span>
+    </div>
     <div class="modal-actions">
       <button class="btn-primary" onclick="closeTutorial()" style="width:100%">はじめる</button>
     </div>
@@ -1194,10 +1194,10 @@ body {
       </div>
 
     </div>
-    <label style="display:flex;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--text-secondary);cursor:pointer" id="install-hide-label">
-      <input type="checkbox" id="install-hide-check" style="width:18px;height:18px">
-      今後は表示しない
-    </label>
+    <div id="install-hide-label" onclick="var c=document.getElementById('install-hide-check');c.checked=!c.checked;" style="display:flex;align-items:center;gap:10px;margin:12px 0;padding:12px;font-size:15px;color:var(--text-secondary);cursor:pointer;border:1px solid var(--border);border-radius:8px">
+      <input type="checkbox" id="install-hide-check" onclick="event.stopPropagation()" style="width:24px;height:24px;min-width:24px;cursor:pointer">
+      <span>今後は表示しない</span>
+    </div>
     <div class="modal-actions">
       <button class="btn-primary" onclick="closeInstallGuide()" style="width:100%">OK</button>
     </div>
@@ -1214,10 +1214,10 @@ body {
       <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
       <p style="font-size:13px;color:var(--text-secondary)">【免責事項】本アプリは個人が作成した無料の学習支援ツールです。本アプリの利用により生じたいかなる損害についても、開発者は一切の責任を負いかねます。データの消失やアプリの不具合等に備え、重要なデータは別途保管してください。自己責任にてご利用ください。</p>
     </div>
-    <label id="about-hide-label" style="display:none;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--text-secondary);cursor:pointer">
-      <input type="checkbox" id="about-hide-check" style="width:18px;height:18px">
-      今後は表示しない
-    </label>
+    <div id="about-hide-label" onclick="var c=document.getElementById('about-hide-check');c.checked=!c.checked;" style="display:none;align-items:center;gap:10px;margin:12px 0;padding:12px;font-size:15px;color:var(--text-secondary);cursor:pointer;border:1px solid var(--border);border-radius:8px">
+      <input type="checkbox" id="about-hide-check" onclick="event.stopPropagation()" style="width:24px;height:24px;min-width:24px;cursor:pointer">
+      <span>今後は表示しない</span>
+    </div>
     <div class="modal-actions" style="flex-direction:column;gap:8px">
       <button class="btn-cancel" onclick="hideModal('modal-about');showInstallGuide()" style="width:100%">📲 ホーム画面への追加方法</button>
       <button class="btn-primary" onclick="closeAboutAuto()" style="width:100%" id="about-close-btn">閉じる</button>
