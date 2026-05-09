@@ -1,6 +1,6 @@
 {
-  "name": "くりかえし - テスト勉強アプリ",
-  "short_name": "くりかえし",
+  "name": "くりトレ - テスト勉強アプリ",
+  "short_name": "くりトレ",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F2F2F7",

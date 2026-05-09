@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kurikaeshi-v4';
+const CACHE_NAME = 'kuritore-v1';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
