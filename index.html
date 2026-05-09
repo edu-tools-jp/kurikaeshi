@@ -1214,9 +1214,13 @@ body {
       <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
       <p style="font-size:13px;color:var(--text-secondary)">【免責事項】本アプリは個人が作成した無料の学習支援ツールです。本アプリの利用により生じたいかなる損害についても、開発者は一切の責任を負いかねます。データの消失やアプリの不具合等に備え、重要なデータは別途保管してください。自己責任にてご利用ください。</p>
     </div>
+    <label id="about-hide-label" style="display:none;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--text-secondary);cursor:pointer">
+      <input type="checkbox" id="about-hide-check" style="width:18px;height:18px">
+      今後は表示しない
+    </label>
     <div class="modal-actions" style="flex-direction:column;gap:8px">
       <button class="btn-cancel" onclick="hideModal('modal-about');showInstallGuide()" style="width:100%">📲 ホーム画面への追加方法</button>
-      <button class="btn-primary" onclick="hideModal('modal-about')" style="width:100%">閉じる</button>
+      <button class="btn-primary" onclick="closeAboutAuto()" style="width:100%" id="about-close-btn">閉じる</button>
     </div>
   </div>
 </div>
@@ -2343,6 +2347,8 @@ document.getElementById('input-unit').addEventListener('keydown', e => {
 function showTutorial() {
   if (!localStorage.getItem('hideTutorial')) {
     document.getElementById('modal-tutorial').classList.add('active');
+  } else if (!localStorage.getItem('hideAbout')) {
+    showAboutAuto();
   } else {
     showInstallGuideAuto();
   }
@@ -2353,6 +2359,24 @@ function closeTutorial() {
     localStorage.setItem('hideTutorial', '1');
   }
   hideModal('modal-tutorial');
+  showAboutAuto();
+}
+
+function showAboutAuto() {
+  if (!localStorage.getItem('hideAbout')) {
+    document.getElementById('about-hide-label').style.display = 'flex';
+    document.getElementById('modal-about').classList.add('active');
+  } else {
+    showInstallGuideAuto();
+  }
+}
+
+function closeAboutAuto() {
+  if (document.getElementById('about-hide-check').checked) {
+    localStorage.setItem('hideAbout', '1');
+  }
+  document.getElementById('about-hide-check').checked = false;
+  hideModal('modal-about');
   showInstallGuideAuto();
 }
 
