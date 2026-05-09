@@ -967,6 +967,7 @@ body {
   <div id="screen-subjects" class="screen active">
     <div class="header">
       <h1>📚 くりかえし</h1>
+      <button class="header-btn" onclick="document.getElementById('modal-about').classList.add('active')" style="font-size:16px">ℹ️</button>
     </div>
     <div id="subject-list" class="list-container"></div>
     <button class="fab" onclick="showAddSubjectModal()">＋</button>
@@ -1111,6 +1112,54 @@ body {
     <div class="modal-actions">
       <button class="btn-cancel" onclick="hideModal('modal-confirm')">キャンセル</button>
       <button class="btn-danger" id="confirm-btn" onclick="">削除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tutorial Modal -->
+<div id="modal-tutorial" class="modal-overlay">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto">
+    <h2 style="text-align:center">📚 くりかえし の使い方</h2>
+    <div style="font-size:14px;line-height:1.9;color:var(--text)">
+      <div style="margin-bottom:14px">
+        <strong>① 教科・単元を作る</strong><br>
+        <span style="color:var(--text-secondary)">右下の ＋ ボタンから教科を追加し、その中に単元を作ります。</span>
+      </div>
+      <div style="margin-bottom:14px">
+        <strong>② 問題を撮影する</strong><br>
+        <span style="color:var(--text-secondary)">📷 ボタンで問題集を撮影。1問ずつ撮るのがおすすめです。トリミングや答えの白塗りもできます。</span>
+      </div>
+      <div style="margin-bottom:14px">
+        <strong>③ 復習する</strong><br>
+        <span style="color:var(--text-secondary)">▶ ボタンで復習スタート。正解した問題は自動で外れ、間違えた問題だけくりかえし出題されます。</span>
+      </div>
+      <div style="margin-bottom:14px">
+        <strong>④ 全問正解をめざそう！</strong><br>
+        <span style="color:var(--text-secondary)">すべて正解するまでくりかえし解きましょう。テスト前には「すべての問題」モードで総復習もできます。</span>
+      </div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--text-secondary);cursor:pointer">
+      <input type="checkbox" id="tutorial-hide-check" style="width:18px;height:18px">
+      今後は表示しない
+    </label>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeTutorial()" style="width:100%">はじめる</button>
+    </div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div id="modal-about" class="modal-overlay" onclick="closeModal(event, 'modal-about')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:80vh;overflow-y:auto">
+    <h2>このアプリについて</h2>
+    <div style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px">
+      <p style="margin-bottom:12px"><strong>くりかえし</strong>は、テスト勉強のための無料アプリです。問題集を撮影して、くりかえし解き直すことができます。</p>
+      <p style="margin-bottom:12px">撮影した写真や学習データはすべてお使いの端末内に保存され、外部に送信されることはありません。</p>
+      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+      <p style="font-size:13px;color:var(--text-secondary)">【免責事項】本アプリは個人が作成した無料の学習支援ツールです。本アプリの利用により生じたいかなる損害についても、開発者は一切の責任を負いかねます。データの消失やアプリの不具合等に備え、重要なデータは別途保管してください。自己責任にてご利用ください。</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="hideModal('modal-about')" style="width:100%">閉じる</button>
     </div>
   </div>
 </div>
@@ -2233,9 +2282,24 @@ document.getElementById('input-unit').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveUnit();
 });
 
+// ==================== Tutorial ====================
+function showTutorial() {
+  if (!localStorage.getItem('hideTutorial')) {
+    document.getElementById('modal-tutorial').classList.add('active');
+  }
+}
+
+function closeTutorial() {
+  if (document.getElementById('tutorial-hide-check').checked) {
+    localStorage.setItem('hideTutorial', '1');
+  }
+  hideModal('modal-tutorial');
+}
+
 // ==================== Init ====================
 openDB().then(() => {
   renderSubjects();
+  showTutorial();
 });
 
 // Register service worker
