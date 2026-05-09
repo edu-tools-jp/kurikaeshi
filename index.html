@@ -1148,6 +1148,62 @@ body {
   </div>
 </div>
 
+<!-- Install Guide Modal -->
+<div id="modal-install" class="modal-overlay" onclick="closeModal(event, 'modal-install')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto">
+    <h2 style="text-align:center">📲 ホーム画面に追加</h2>
+    <p style="font-size:13px;color:var(--text-secondary);text-align:center;margin-bottom:16px">ホーム画面に追加すると、アプリのように使えます</p>
+    <div style="font-size:14px;line-height:1.8;color:var(--text)">
+
+      <div style="background:#f0f7ff;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <strong>🍎 iPhone / iPad（Safari）</strong>
+        <ol style="margin:8px 0 0 18px;color:var(--text-secondary);font-size:13px">
+          <li>Safariでこのページを開く</li>
+          <li>画面下の <strong>共有ボタン（□↑）</strong>をタップ</li>
+          <li><strong>「ホーム画面に追加」</strong>をタップ</li>
+          <li>「追加」をタップして完了</li>
+        </ol>
+      </div>
+
+      <div style="background:#f0fff0;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <strong>🤖 Android（Chrome）</strong>
+        <ol style="margin:8px 0 0 18px;color:var(--text-secondary);font-size:13px">
+          <li>Chromeでこのページを開く</li>
+          <li>右上の <strong>︙（メニュー）</strong>をタップ</li>
+          <li><strong>「ホーム画面に追加」</strong>をタップ</li>
+          <li>「追加」をタップして完了</li>
+        </ol>
+      </div>
+
+      <div style="background:#fff8f0;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <strong>🪟 Windows（Chrome / Edge）</strong>
+        <ol style="margin:8px 0 0 18px;color:var(--text-secondary);font-size:13px">
+          <li>Chrome または Edge でこのページを開く</li>
+          <li>アドレスバー右の <strong>インストールアイコン（⊕）</strong>をクリック</li>
+          <li>「インストール」をクリックして完了</li>
+        </ol>
+      </div>
+
+      <div style="background:#f5f0ff;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <strong>💻 Chromebook</strong>
+        <ol style="margin:8px 0 0 18px;color:var(--text-secondary);font-size:13px">
+          <li>Chromeでこのページを開く</li>
+          <li>アドレスバー右の <strong>インストールアイコン（⊕）</strong>をクリック</li>
+          <li>「インストール」をクリックして完了</li>
+        </ol>
+      </div>
+
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--text-secondary);cursor:pointer" id="install-hide-label">
+      <input type="checkbox" id="install-hide-check" style="width:18px;height:18px">
+      今後は表示しない
+    </label>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeInstallGuide()" style="width:100%">OK</button>
+    </div>
+  </div>
+</div>
+
 <!-- About Modal -->
 <div id="modal-about" class="modal-overlay" onclick="closeModal(event, 'modal-about')">
   <div class="modal" onclick="event.stopPropagation()" style="max-height:80vh;overflow-y:auto">
@@ -1158,7 +1214,8 @@ body {
       <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
       <p style="font-size:13px;color:var(--text-secondary)">【免責事項】本アプリは個人が作成した無料の学習支援ツールです。本アプリの利用により生じたいかなる損害についても、開発者は一切の責任を負いかねます。データの消失やアプリの不具合等に備え、重要なデータは別途保管してください。自己責任にてご利用ください。</p>
     </div>
-    <div class="modal-actions">
+    <div class="modal-actions" style="flex-direction:column;gap:8px">
+      <button class="btn-cancel" onclick="hideModal('modal-about');showInstallGuide()" style="width:100%">📲 ホーム画面への追加方法</button>
       <button class="btn-primary" onclick="hideModal('modal-about')" style="width:100%">閉じる</button>
     </div>
   </div>
@@ -2282,10 +2339,12 @@ document.getElementById('input-unit').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveUnit();
 });
 
-// ==================== Tutorial ====================
+// ==================== Tutorial & Install Guide ====================
 function showTutorial() {
   if (!localStorage.getItem('hideTutorial')) {
     document.getElementById('modal-tutorial').classList.add('active');
+  } else {
+    showInstallGuideAuto();
   }
 }
 
@@ -2294,6 +2353,28 @@ function closeTutorial() {
     localStorage.setItem('hideTutorial', '1');
   }
   hideModal('modal-tutorial');
+  showInstallGuideAuto();
+}
+
+function showInstallGuideAuto() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (!isStandalone && !localStorage.getItem('hideInstallGuide')) {
+    document.getElementById('install-hide-label').style.display = 'flex';
+    document.getElementById('modal-install').classList.add('active');
+  }
+}
+
+function showInstallGuide() {
+  document.getElementById('install-hide-label').style.display = 'none';
+  document.getElementById('modal-install').classList.add('active');
+}
+
+function closeInstallGuide() {
+  if (document.getElementById('install-hide-check').checked) {
+    localStorage.setItem('hideInstallGuide', '1');
+  }
+  document.getElementById('install-hide-check').checked = false;
+  hideModal('modal-install');
 }
 
 // ==================== Init ====================
