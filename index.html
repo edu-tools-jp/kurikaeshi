@@ -1281,7 +1281,7 @@ body {
   <div class="crop-canvas-container" id="crop-container">
     <canvas id="crop-canvas"></canvas>
   </div>
-  <div class="crop-instructions">指でドラッグして必要な部分を選択してください</div>
+  <div class="crop-instructions">枠の角や辺をドラッグして範囲を調整してください</div>
 </div>
 
 <!-- Context Menu -->
@@ -1880,11 +1880,10 @@ function drawCrop() {
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const r = cropRect;
-  const x = Math.min(r.x, r.x + r.w);
-  const y = Math.min(r.y, r.y + r.h);
-  const w = Math.abs(r.w);
-  const h = Math.abs(r.h);
+  const x = cropRect.x;
+  const y = cropRect.y;
+  const w = cropRect.w;
+  const h = cropRect.h;
 
   ctx.clearRect(x, y, w, h);
   ctx.drawImage(cropImage,
@@ -1929,44 +1928,107 @@ function drawCrop() {
 function getCropPos(e) {
   const canvas = document.getElementById('crop-canvas');
   const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
   const touch = e.touches ? e.touches[0] : e;
   return {
-    x: touch.clientX - rect.left,
-    y: touch.clientY - rect.top
+    x: (touch.clientX - rect.left) * scaleX,
+    y: (touch.clientY - rect.top) * scaleY
   };
+}
+
+let cropDragMode = null;
+const CROP_HANDLE = 30;
+const CROP_MIN = 40;
+
+function getCropHandle(pos) {
+  const x = cropRect.x, y = cropRect.y;
+  const w = cropRect.w, h = cropRect.h;
+  const right = x + w, bottom = y + h;
+  const hx = CROP_HANDLE;
+
+  if (Math.abs(pos.x - x) < hx && Math.abs(pos.y - y) < hx) return 'tl';
+  if (Math.abs(pos.x - right) < hx && Math.abs(pos.y - y) < hx) return 'tr';
+  if (Math.abs(pos.x - x) < hx && Math.abs(pos.y - bottom) < hx) return 'bl';
+  if (Math.abs(pos.x - right) < hx && Math.abs(pos.y - bottom) < hx) return 'br';
+
+  if (Math.abs(pos.x - x) < hx && pos.y > y + hx && pos.y < bottom - hx) return 'l';
+  if (Math.abs(pos.x - right) < hx && pos.y > y + hx && pos.y < bottom - hx) return 'r';
+  if (Math.abs(pos.y - y) < hx && pos.x > x + hx && pos.x < right - hx) return 't';
+  if (Math.abs(pos.y - bottom) < hx && pos.x > x + hx && pos.x < right - hx) return 'b';
+
+  if (pos.x > x + hx && pos.x < right - hx && pos.y > y + hx && pos.y < bottom - hx) return 'move';
+  return null;
 }
 
 (function setupCropEvents() {
   const canvas = document.getElementById('crop-canvas');
+  let startPos = null;
+  let startRect = null;
+
+  function normalize() {
+    const x = Math.min(cropRect.x, cropRect.x + cropRect.w);
+    const y = Math.min(cropRect.y, cropRect.y + cropRect.h);
+    const w = Math.abs(cropRect.w);
+    const h = Math.abs(cropRect.h);
+    cropRect = { x, y, w, h };
+  }
+
+  function clamp() {
+    if (cropRect.x < 0) cropRect.x = 0;
+    if (cropRect.y < 0) cropRect.y = 0;
+    if (cropRect.x + cropRect.w > canvas.width) cropRect.w = canvas.width - cropRect.x;
+    if (cropRect.y + cropRect.h > canvas.height) cropRect.h = canvas.height - cropRect.y;
+    if (cropRect.w < CROP_MIN) cropRect.w = CROP_MIN;
+    if (cropRect.h < CROP_MIN) cropRect.h = CROP_MIN;
+  }
 
   function onStart(e) {
     e.preventDefault();
     const pos = getCropPos(e);
-    cropStartX = pos.x;
-    cropStartY = pos.y;
-    cropRect.x = pos.x;
-    cropRect.y = pos.y;
-    cropRect.w = 0;
-    cropRect.h = 0;
-    cropDragging = true;
+    normalize();
+    cropDragMode = getCropHandle(pos);
+    if (cropDragMode) {
+      startPos = pos;
+      startRect = { ...cropRect };
+      cropDragging = true;
+    }
   }
 
   function onMove(e) {
-    if (!cropDragging) return;
+    if (!cropDragging || !cropDragMode) return;
     e.preventDefault();
     const pos = getCropPos(e);
-    cropRect.w = pos.x - cropStartX;
-    cropRect.h = pos.y - cropStartY;
+    const dx = pos.x - startPos.x;
+    const dy = pos.y - startPos.y;
+    const s = startRect;
+
+    if (cropDragMode === 'move') {
+      cropRect.x = Math.max(0, Math.min(s.x + dx, canvas.width - s.w));
+      cropRect.y = Math.max(0, Math.min(s.y + dy, canvas.height - s.h));
+    } else {
+      if (cropDragMode.includes('l')) {
+        cropRect.x = Math.min(s.x + dx, s.x + s.w - CROP_MIN);
+        cropRect.w = s.w - (cropRect.x - s.x);
+      }
+      if (cropDragMode.includes('r')) {
+        cropRect.w = Math.max(CROP_MIN, s.w + dx);
+      }
+      if (cropDragMode.includes('t')) {
+        cropRect.y = Math.min(s.y + dy, s.y + s.h - CROP_MIN);
+        cropRect.h = s.h - (cropRect.y - s.y);
+      }
+      if (cropDragMode.includes('b')) {
+        cropRect.h = Math.max(CROP_MIN, s.h + dy);
+      }
+      clamp();
+    }
     drawCrop();
   }
 
-  function onEnd(e) {
-    if (!cropDragging) return;
+  function onEnd() {
     cropDragging = false;
-    if (Math.abs(cropRect.w) < 10 || Math.abs(cropRect.h) < 10) {
-      cropRect = { x: 0, y: 0, w: canvas.width, h: canvas.height };
-      drawCrop();
-    }
+    cropDragMode = null;
   }
 
   canvas.addEventListener('mousedown', onStart);
@@ -1981,10 +2043,10 @@ function applyCrop() {
   const canvas = document.getElementById('crop-canvas');
   const scale = canvas._scale;
 
-  let sx = Math.min(cropRect.x, cropRect.x + cropRect.w) / scale;
-  let sy = Math.min(cropRect.y, cropRect.y + cropRect.h) / scale;
-  let sw = Math.abs(cropRect.w) / scale;
-  let sh = Math.abs(cropRect.h) / scale;
+  let sx = cropRect.x / scale;
+  let sy = cropRect.y / scale;
+  let sw = cropRect.w / scale;
+  let sh = cropRect.h / scale;
 
   sx = Math.max(0, sx);
   sy = Math.max(0, sy);
