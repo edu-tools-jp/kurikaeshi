@@ -1026,8 +1026,12 @@ body {
       </div>
       <div id="capture-confirm" class="capture-actions" style="display:none;flex-wrap:wrap">
         <button class="btn-cancel" onclick="retakePhoto()" style="flex:1 1 45%">撮り直す</button>
-        <button class="btn-primary" onclick="saveCapture()" style="flex:1 1 45%">登録する</button>
+        <button class="btn-primary" onclick="saveCapture()" style="flex:1 1 45%" id="btn-save-capture">登録する</button>
         <button class="btn-cancel" onclick="openMaskScreen()" style="flex:1 1 100%;background:#FFE0E0;color:var(--danger)">答えを隠す（白塗り）</button>
+        <button type="button" id="multi-crop-btn" onclick="toggleMultiCrop()" style="flex:1 1 100%;display:flex;align-items:center;gap:10px;padding:12px;font-size:14px;color:var(--text-secondary);cursor:pointer;border:1px solid var(--border);border-radius:8px;background:white;justify-content:center">
+          <span id="multi-crop-icon" style="font-size:18px">☐</span>
+          <span>1枚の写真から複数の問題を登録する</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1275,7 +1279,7 @@ body {
 <div id="crop-overlay" class="crop-overlay">
   <div class="crop-header">
     <button onclick="cancelCrop()">キャンセル</button>
-    <span style="font-weight:600">トリミング</span>
+    <span style="font-weight:600" id="crop-title">トリミング</span>
     <button onclick="applyCrop()">完了</button>
   </div>
   <div class="crop-canvas-container" id="crop-container">
@@ -1806,8 +1810,23 @@ function viewProblem(id) {
 }
 
 // ==================== Capture ====================
+let multiCropMode = false;
+let originalCropImage = null;
+let multiCropCount = 0;
+
+function toggleMultiCrop() {
+  multiCropMode = !multiCropMode;
+  document.getElementById('multi-crop-icon').textContent = multiCropMode ? '☑' : '☐';
+  document.getElementById('btn-save-capture').textContent = multiCropMode ? '登録して次へ' : '登録する';
+}
+
 function startCapture() {
   capturedImages = [];
+  multiCropMode = false;
+  originalCropImage = null;
+  multiCropCount = 0;
+  document.getElementById('multi-crop-icon').textContent = '☐';
+  document.getElementById('btn-save-capture').textContent = '登録する';
   document.getElementById('capture-preview').style.display = 'none';
   document.getElementById('capture-initial').style.display = 'block';
   document.getElementById('capture-confirm').style.display = 'none';
@@ -1832,6 +1851,8 @@ function handleCapture(e) {
   if (!files || files.length === 0) return;
 
   loadImageFromFile(files[0]).then(img => {
+    originalCropImage = img;
+    multiCropCount = 0;
     openCropScreen(img);
   });
 }
@@ -1857,6 +1878,12 @@ function openCropScreen(img) {
   const canvas = document.getElementById('crop-canvas');
   const container = document.getElementById('crop-container');
   overlay.classList.add('active');
+
+  if (multiCropMode && multiCropCount > 0) {
+    document.getElementById('crop-title').textContent = 'トリミング（' + multiCropCount + '問登録済み）';
+  } else {
+    document.getElementById('crop-title').textContent = 'トリミング';
+  }
 
   requestAnimationFrame(() => {
     const cw = container.clientWidth;
@@ -2077,6 +2104,11 @@ function applyCrop() {
 function cancelCrop() {
   document.getElementById('crop-overlay').classList.remove('active');
   cropImage = null;
+  if (multiCropMode && multiCropCount > 0) {
+    multiCropMode = false;
+    originalCropImage = null;
+    showScreen('problems');
+  }
 }
 
 function retakePhoto() {
@@ -2100,6 +2132,13 @@ async function saveCapture() {
       order: probs.length + capturedImages.indexOf(img),
       createdAt: Date.now()
     });
+  }
+  multiCropCount++;
+
+  if (multiCropMode && originalCropImage) {
+    capturedImages = [];
+    openCropScreen(originalCropImage);
+    return;
   }
   showScreen('problems');
 }
