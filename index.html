@@ -1027,6 +1027,9 @@ body {
       <div id="capture-confirm" class="capture-actions" style="display:none;flex-wrap:wrap">
         <button class="btn-cancel" onclick="retakePhoto()" style="flex:1 1 45%">撮り直す</button>
         <button class="btn-primary" onclick="saveCapture()" style="flex:1 1 45%" id="btn-save-capture">登録する</button>
+        <div style="flex:1 1 100%;position:relative">
+          <input type="text" id="input-answer" placeholder="答えを入力（任意）" style="width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-size:15px;-webkit-appearance:none">
+        </div>
         <button class="btn-cancel" onclick="openMaskScreen()" style="flex:1 1 100%;background:#FFE0E0;color:var(--danger)">答えを隠す（白塗り）</button>
         <button type="button" id="multi-crop-btn" onclick="toggleMultiCrop()" style="flex:1 1 100%;display:flex;align-items:center;gap:10px;padding:12px;font-size:14px;color:var(--text-secondary);cursor:pointer;border:1px solid var(--border);border-radius:8px;background:white;justify-content:center">
           <span id="multi-crop-icon" style="font-size:18px">☐</span>
@@ -1051,6 +1054,9 @@ body {
       </div>
       <div class="quiz-image-container">
         <img id="quiz-image" class="quiz-image">
+      </div>
+      <div id="quiz-answer-area" style="display:none;padding:0 16px">
+        <button id="quiz-answer-btn" onclick="toggleQuizAnswer()" style="width:100%;padding:10px;border-radius:10px;font-size:15px;cursor:pointer;background:#F0F0FF;color:var(--primary);border:1px solid var(--border)">💡 答えを見る</button>
       </div>
       <div class="quiz-actions">
         <button class="quiz-btn quiz-btn-wrong" onclick="markAnswer(false)">✕ まちがい</button>
@@ -1739,6 +1745,7 @@ function showProblemMenu(e, id) {
   dbGetByIndex('problems', 'unitId', currentUnit.id).then(probs => {
     const p = probs.find(x => x.id === id);
     const items = [];
+    items.push({ label: '📝 答えを編集', action: () => editAnswer(id) });
     if (p.correct) {
       items.push({ label: '↩ 未正解にもどす', action: () => toggleCorrect(id, false) });
     } else {
@@ -1755,6 +1762,35 @@ async function toggleCorrect(id, correct) {
   p.correct = correct;
   await dbPut('problems', p);
   renderProblems();
+}
+
+async function editAnswer(id) {
+  const probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+  const p = probs.find(x => x.id === id);
+  const current = p.answer || '';
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;';
+  overlay.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:24px;width:100%;max-width:400px" onclick="event.stopPropagation()">
+      <h2 style="font-size:20px;margin-bottom:16px">答えを編集</h2>
+      <input type="text" id="edit-answer-input" value="${esc(current)}" placeholder="答えを入力（空欄で削除）" style="width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:10px;font-size:16px;margin-bottom:12px;-webkit-appearance:none">
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button onclick="this.closest('div[style]').parentElement.remove()" style="flex:1;padding:12px;border-radius:10px;font-size:16px;font-weight:600;border:none;cursor:pointer;background:var(--bg);color:var(--text)">キャンセル</button>
+        <button id="edit-answer-save" style="flex:1;padding:12px;border-radius:10px;font-size:16px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:white">保存</button>
+      </div>
+    </div>`;
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+  const input = document.getElementById('edit-answer-input');
+  const saveBtn = document.getElementById('edit-answer-save');
+  setTimeout(() => input.focus(), 300);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') saveBtn.click(); });
+  saveBtn.onclick = async () => {
+    p.answer = input.value.trim();
+    await dbPut('problems', p);
+    overlay.remove();
+    renderProblems();
+  };
 }
 
 function confirmDeleteProblem(id) {
@@ -1774,14 +1810,38 @@ function viewProblem(id) {
   dbGetByIndex('problems', 'unitId', currentUnit.id).then(probs => {
     const p = probs.find(x => x.id === id);
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow-y:auto;';
     const img = document.createElement('img');
     img.src = p.imageData;
-    img.style.cssText = 'max-width:100%;max-height:80%;object-fit:contain;border-radius:8px;';
+    img.style.cssText = 'max-width:100%;max-height:60vh;object-fit:contain;border-radius:8px;flex-shrink:0;';
     overlay.appendChild(img);
 
+    if (p.answer) {
+      const answerArea = document.createElement('div');
+      answerArea.style.cssText = 'margin-top:12px;width:100%;max-width:500px;text-align:center;';
+      const answerBtn = document.createElement('button');
+      answerBtn.textContent = '💡 答えを見る';
+      answerBtn.style.cssText = 'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.3);padding:10px 24px;border-radius:10px;font-size:15px;cursor:pointer;width:100%;';
+      answerBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (answerBtn._revealed) {
+          answerBtn.textContent = '💡 答えを見る';
+          answerBtn.style.background = 'rgba(255,255,255,0.15)';
+          answerBtn.style.fontSize = '15px';
+          answerBtn._revealed = false;
+        } else {
+          answerBtn.textContent = p.answer;
+          answerBtn.style.background = 'rgba(255,255,255,0.25)';
+          answerBtn.style.fontSize = '18px';
+          answerBtn._revealed = true;
+        }
+      };
+      answerArea.appendChild(answerBtn);
+      overlay.appendChild(answerArea);
+    }
+
     const btnRow = document.createElement('div');
-    btnRow.style.cssText = 'margin-top:16px;display:flex;gap:12px;';
+    btnRow.style.cssText = 'margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;';
 
     if (p.correct) {
       const resetBtn = document.createElement('button');
@@ -1796,6 +1856,16 @@ function viewProblem(id) {
       };
       btnRow.appendChild(resetBtn);
     }
+
+    const editAnsBtn = document.createElement('button');
+    editAnsBtn.textContent = '📝 答えを編集';
+    editAnsBtn.style.cssText = 'background:rgba(255,255,255,0.2);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;';
+    editAnsBtn.onclick = (e) => {
+      e.stopPropagation();
+      overlay.remove();
+      editAnswer(p.id);
+    };
+    btnRow.appendChild(editAnsBtn);
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '閉じる';
@@ -1831,6 +1901,7 @@ function startCapture() {
   document.getElementById('capture-initial').style.display = 'block';
   document.getElementById('capture-confirm').style.display = 'none';
   document.getElementById('camera-input').value = '';
+  document.getElementById('input-answer').value = '';
   showScreen('capture');
 }
 
@@ -2122,17 +2193,20 @@ function retakePhoto() {
 
 async function saveCapture() {
   if (capturedImages.length === 0) return;
+  const answer = document.getElementById('input-answer').value.trim();
   const probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
   for (const img of capturedImages) {
     await dbPut('problems', {
       id: 'prob_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       unitId: currentUnit.id,
       imageData: img,
+      answer: answer || '',
       correct: false,
       order: probs.length + capturedImages.indexOf(img),
       createdAt: Date.now()
     });
   }
+  document.getElementById('input-answer').value = '';
   multiCropCount++;
 
   if (multiCropMode && originalCropImage) {
@@ -2321,6 +2395,31 @@ function showQuizProblem() {
   document.getElementById('quiz-image').src = p.imageData;
   document.getElementById('quiz-progress-fill').style.width = (quizIndex / quizProblems.length * 100) + '%';
   document.getElementById('quiz-progress-text').textContent = `${quizIndex + 1} / ${quizProblems.length}`;
+
+  const answerArea = document.getElementById('quiz-answer-area');
+  const answerBtn = document.getElementById('quiz-answer-btn');
+  if (p.answer) {
+    answerArea.style.display = 'block';
+    answerBtn.textContent = '💡 答えを見る';
+    answerBtn.style.fontSize = '15px';
+    answerBtn._revealed = false;
+    answerBtn._answer = p.answer;
+  } else {
+    answerArea.style.display = 'none';
+  }
+}
+
+function toggleQuizAnswer() {
+  const btn = document.getElementById('quiz-answer-btn');
+  if (btn._revealed) {
+    btn.textContent = '💡 答えを見る';
+    btn.style.fontSize = '15px';
+    btn._revealed = false;
+  } else {
+    btn.textContent = btn._answer;
+    btn.style.fontSize = '18px';
+    btn._revealed = true;
+  }
 }
 
 async function markAnswer(correct) {
