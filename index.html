@@ -1018,11 +1018,15 @@ body {
       <h1>問題を撮影</h1>
     </div>
     <div class="capture-area">
-      <input type="file" accept="image/*" id="camera-input" class="hidden-input" onchange="handleCapture(event)">
+      <input type="file" accept="image/*" capture="environment" id="camera-input" class="hidden-input" onchange="handleCapture(event)">
+      <input type="file" accept="image/*" id="file-input" class="hidden-input" onchange="handleCapture(event)">
       <img id="capture-preview" class="capture-preview">
       <div id="capture-initial">
-        <p style="color:var(--text-secondary);margin-bottom:20px;text-align:center">問題集の問題を撮影してください<br>1問ずつ撮影するのがおすすめです</p>
-        <button class="capture-btn" onclick="document.getElementById('camera-input').click()">📷</button>
+        <p style="color:var(--text-secondary);margin-bottom:20px;text-align:center">問題集の問題を撮影または<br>画像を選んでください</p>
+        <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:280px">
+          <button onclick="document.getElementById('camera-input').click()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;gap:10px">カメラで撮影</button>
+          <button onclick="document.getElementById('file-input').click()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--card);color:var(--text);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:10px">写真・ファイルから選ぶ</button>
+        </div>
       </div>
       <div id="capture-confirm" class="capture-actions" style="display:none;flex-wrap:wrap">
         <button class="btn-cancel" onclick="retakePhoto()" style="flex:1 1 45%">撮り直す</button>
@@ -1901,6 +1905,7 @@ function startCapture() {
   document.getElementById('capture-initial').style.display = 'block';
   document.getElementById('capture-confirm').style.display = 'none';
   document.getElementById('camera-input').value = '';
+  document.getElementById('file-input').value = '';
   document.getElementById('input-answer').value = '';
   showScreen('capture');
 }
@@ -2188,7 +2193,7 @@ function retakePhoto() {
   document.getElementById('capture-initial').style.display = 'block';
   document.getElementById('capture-confirm').style.display = 'none';
   document.getElementById('camera-input').value = '';
-  document.getElementById('camera-input').click();
+  document.getElementById('file-input').value = '';
 }
 
 async function saveCapture() {
