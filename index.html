@@ -1906,17 +1906,18 @@ let currentCameraIndex = 0;
 
 async function openLiveCamera() {
   try {
-    // まず一度カメラを起動してデバイス一覧を取得
+    // まずシンプルにカメラを起動（権限を取得）
     const initialStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+      video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
-    // デバイス一覧を取得
+    // 権限取得後にデバイス一覧を取得
     const devices = await navigator.mediaDevices.enumerateDevices();
     cameraDevices = devices.filter(d => d.kind === 'videoinput');
     // 現在使用中のカメラのインデックスを特定
     const activeTrack = initialStream.getVideoTracks()[0];
-    const activeDeviceId = activeTrack.getSettings().deviceId;
+    const activeSettings = activeTrack.getSettings();
+    const activeDeviceId = activeSettings.deviceId;
     currentCameraIndex = cameraDevices.findIndex(d => d.deviceId === activeDeviceId);
     if (currentCameraIndex < 0) currentCameraIndex = 0;
 
@@ -1925,7 +1926,13 @@ async function openLiveCamera() {
     video.srcObject = initialStream;
     document.getElementById('camera-overlay').style.display = 'flex';
     // カメラが2台以上あれば切替ボタンを表示
-    document.getElementById('switch-camera-btn').style.display = cameraDevices.length >= 2 ? 'block' : 'none';
+    const switchBtn = document.getElementById('switch-camera-btn');
+    if (cameraDevices.length >= 2) {
+      switchBtn.style.display = 'block';
+      switchBtn.textContent = 'カメラ切替 (1/' + cameraDevices.length + ')';
+    } else {
+      switchBtn.style.display = 'none';
+    }
   } catch (err) {
     alert('カメラを起動できませんでした。\n「写真・ファイルから選ぶ」をお試しください。');
   }
@@ -1946,6 +1953,7 @@ async function switchCamera() {
     });
     cameraStream = stream;
     document.getElementById('camera-video').srcObject = stream;
+    document.getElementById('switch-camera-btn').textContent = 'カメラ切替 (' + (currentCameraIndex + 1) + '/' + cameraDevices.length + ')';
   } catch (err) {
     alert('カメラの切り替えに失敗しました。');
   }
