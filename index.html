@@ -1018,13 +1018,12 @@ body {
       <h1>問題を撮影</h1>
     </div>
     <div class="capture-area">
-      <input type="file" accept="image/*" capture="environment" id="camera-input" class="hidden-input" onchange="handleCapture(event)">
       <input type="file" accept="image/*" id="file-input" class="hidden-input" onchange="handleCapture(event)">
       <img id="capture-preview" class="capture-preview">
       <div id="capture-initial">
         <p style="color:var(--text-secondary);margin-bottom:20px;text-align:center">問題集の問題を撮影または<br>画像を選んでください</p>
         <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:280px">
-          <button onclick="document.getElementById('camera-input').click()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;gap:10px">カメラで撮影</button>
+          <button onclick="openLiveCamera()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;gap:10px">カメラで撮影</button>
           <button onclick="document.getElementById('file-input').click()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--card);color:var(--text);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:10px">写真・ファイルから選ぶ</button>
         </div>
       </div>
@@ -1282,6 +1281,23 @@ body {
     <div class="modal-actions" style="margin-top:12px">
       <button class="btn-cancel" onclick="hideModal('modal-quiz-mode')">キャンセル</button>
     </div>
+  </div>
+</div>
+
+<!-- Camera Overlay -->
+<div id="camera-overlay" style="position:fixed;inset:0;background:#000;z-index:270;display:none;flex-direction:column">
+  <div style="padding:calc(var(--safe-top) + 8px) 16px 12px;display:flex;justify-content:space-between;align-items:center;z-index:2">
+    <button onclick="closeLiveCamera()" style="background:none;border:none;color:white;font-size:16px;font-weight:600;padding:8px;cursor:pointer">キャンセル</button>
+    <span style="color:white;font-weight:600">撮影</span>
+    <span style="width:80px"></span>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <video id="camera-video" autoplay playsinline style="max-width:100%;max-height:100%;object-fit:contain"></video>
+  </div>
+  <div style="padding:20px;padding-bottom:calc(20px + var(--safe-bottom));display:flex;align-items:center;justify-content:center">
+    <button id="shutter-btn" onclick="takePhoto()" style="width:72px;height:72px;border-radius:50%;border:4px solid white;background:rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:white"></div>
+    </button>
   </div>
 </div>
 
@@ -1883,6 +1899,50 @@ function viewProblem(id) {
   });
 }
 
+// ==================== Live Camera ====================
+let cameraStream = null;
+
+async function openLiveCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+    cameraStream = stream;
+    const video = document.getElementById('camera-video');
+    video.srcObject = stream;
+    document.getElementById('camera-overlay').style.display = 'flex';
+  } catch (err) {
+    alert('カメラを起動できませんでした。\n「写真・ファイルから選ぶ」をお試しください。');
+  }
+}
+
+function closeLiveCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  document.getElementById('camera-video').srcObject = null;
+  document.getElementById('camera-overlay').style.display = 'none';
+}
+
+function takePhoto() {
+  const video = document.getElementById('camera-video');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  closeLiveCamera();
+
+  const img = new Image();
+  img.onload = () => {
+    originalCropImage = img;
+    multiCropCount = 0;
+    openCropScreen(img);
+  };
+  img.src = canvas.toDataURL('image/jpeg', 0.9);
+}
+
 // ==================== Capture ====================
 let multiCropMode = false;
 let originalCropImage = null;
@@ -1904,7 +1964,7 @@ function startCapture() {
   document.getElementById('capture-preview').style.display = 'none';
   document.getElementById('capture-initial').style.display = 'block';
   document.getElementById('capture-confirm').style.display = 'none';
-  document.getElementById('camera-input').value = '';
+
   document.getElementById('file-input').value = '';
   document.getElementById('input-answer').value = '';
   showScreen('capture');
@@ -2192,7 +2252,7 @@ function retakePhoto() {
   document.getElementById('capture-preview').style.display = 'none';
   document.getElementById('capture-initial').style.display = 'block';
   document.getElementById('capture-confirm').style.display = 'none';
-  document.getElementById('camera-input').value = '';
+
   document.getElementById('file-input').value = '';
 }
 
