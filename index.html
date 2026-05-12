@@ -1289,7 +1289,7 @@ body {
   <div style="padding:calc(var(--safe-top) + 8px) 16px 12px;display:flex;justify-content:space-between;align-items:center;z-index:2">
     <button onclick="closeLiveCamera()" style="background:none;border:none;color:white;font-size:16px;font-weight:600;padding:8px;cursor:pointer">キャンセル</button>
     <span style="color:white;font-weight:600">撮影</span>
-    <span style="width:80px"></span>
+    <button id="switch-camera-btn" onclick="switchCamera()" style="background:rgba(255,255,255,0.2);border:none;color:white;font-size:14px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;display:none">切替</button>
   </div>
   <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden">
     <video id="camera-video" autoplay playsinline style="max-width:100%;max-height:100%;object-fit:contain"></video>
@@ -1901,19 +1901,53 @@ function viewProblem(id) {
 
 // ==================== Live Camera ====================
 let cameraStream = null;
+let cameraDevices = [];
+let currentCameraIndex = 0;
 
 async function openLiveCamera() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    // まず一度カメラを起動してデバイス一覧を取得
+    const initialStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
-    cameraStream = stream;
+    // デバイス一覧を取得
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    cameraDevices = devices.filter(d => d.kind === 'videoinput');
+    // 現在使用中のカメラのインデックスを特定
+    const activeTrack = initialStream.getVideoTracks()[0];
+    const activeDeviceId = activeTrack.getSettings().deviceId;
+    currentCameraIndex = cameraDevices.findIndex(d => d.deviceId === activeDeviceId);
+    if (currentCameraIndex < 0) currentCameraIndex = 0;
+
+    cameraStream = initialStream;
     const video = document.getElementById('camera-video');
-    video.srcObject = stream;
+    video.srcObject = initialStream;
     document.getElementById('camera-overlay').style.display = 'flex';
+    // カメラが2台以上あれば切替ボタンを表示
+    document.getElementById('switch-camera-btn').style.display = cameraDevices.length >= 2 ? 'block' : 'none';
   } catch (err) {
     alert('カメラを起動できませんでした。\n「写真・ファイルから選ぶ」をお試しください。');
+  }
+}
+
+async function switchCamera() {
+  if (cameraDevices.length < 2) return;
+  currentCameraIndex = (currentCameraIndex + 1) % cameraDevices.length;
+  const deviceId = cameraDevices[currentCameraIndex].deviceId;
+  // 現在のストリームを停止
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { deviceId: { exact: deviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+    cameraStream = stream;
+    document.getElementById('camera-video').srcObject = stream;
+  } catch (err) {
+    alert('カメラの切り替えに失敗しました。');
   }
 }
 
