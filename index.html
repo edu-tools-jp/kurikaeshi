@@ -940,6 +940,314 @@ body {
   cursor: pointer;
 }
 
+/* Mode tabs (演習/暗記 切替) */
+.mode-tab-bar {
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.mode-tab-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  position: relative;
+}
+
+.mode-tab-btn.active {
+  color: var(--primary);
+}
+
+.mode-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Anki card grid */
+.anki-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  padding-bottom: calc(80px + var(--safe-bottom));
+}
+
+.anki-thumb {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  cursor: pointer;
+}
+
+.anki-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.anki-thumb-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.anki-thumb-number {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.anki-thumb.selected {
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
+  opacity: 0.7;
+}
+
+/* Anki mask overlay */
+.anki-mask-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 300;
+  display: none;
+  flex-direction: column;
+}
+
+.anki-mask-overlay.active {
+  display: flex;
+}
+
+.anki-mask-header {
+  padding: calc(var(--safe-top) + 8px) 16px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.anki-mask-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.anki-mask-canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.anki-mask-canvas-container canvas {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.anki-mask-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: white;
+  flex-wrap: wrap;
+}
+
+.anki-mask-mode-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.anki-mask-mode-btn.active {
+  background: var(--primary);
+}
+
+.anki-mask-color-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+}
+
+.anki-mask-color-btn.active {
+  border-color: white;
+}
+
+.anki-mask-tool-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.anki-mask-instructions {
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 8px 12px;
+  padding-bottom: calc(8px + var(--safe-bottom));
+  font-size: 14px;
+}
+
+/* Anki study screen */
+.anki-study-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.anki-study-progress {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.anki-study-image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+  position: relative;
+}
+
+.anki-study-image-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.anki-study-image-wrapper img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+}
+
+.anki-study-masks-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.anki-study-mask-piece {
+  position: absolute;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.25s;
+  pointer-events: auto;
+}
+
+.anki-study-mask-pen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: opacity 0.25s;
+  pointer-events: auto;
+}
+
+.anki-study-actions {
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.anki-study-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.anki-study-btn:active {
+  transform: scale(0.96);
+}
+
+.anki-study-toggle-hint {
+  text-align: center;
+  padding: 0 16px 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Anki pen size buttons */
+.anki-pen-size-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.anki-pen-size-btn.active {
+  background: var(--primary);
+}
+
 /* Transition */
 .slide-in {
   animation: slideIn 0.25s ease-out;
@@ -996,19 +1304,34 @@ body {
       <button class="header-btn" onclick="toggleSelectAll()" style="font-size:13px">全選択</button>
       <button class="header-btn" onclick="deleteSelected()" style="font-size:14px;background:rgba(255,59,48,0.3)">🗑</button>
     </div>
-    <div class="stats-bar" id="problems-stats"></div>
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="setFilter('all', this)">すべて</button>
-      <button class="tab-btn" onclick="setFilter('remaining', this)">未正解</button>
-      <button class="tab-btn" onclick="setFilter('correct', this)">正解済み</button>
+    <div class="mode-tab-bar">
+      <button class="mode-tab-btn active" id="mode-tab-drill" onclick="setUnitMode('drill')">演習</button>
+      <button class="mode-tab-btn" id="mode-tab-anki" onclick="setUnitMode('anki')">暗記</button>
     </div>
-    <div id="problem-grid" class="problem-grid"></div>
-    <div id="problems-empty" class="empty-state" style="display:none">
-      <div class="empty-state-icon">📷</div>
-      <div class="empty-state-text">まだ問題がありません<br>＋ボタンで写真を撮って<br>問題を登録しましょう</div>
+    <div id="drill-content">
+      <div class="stats-bar" id="problems-stats"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="setFilter('all', this)">すべて</button>
+        <button class="tab-btn" onclick="setFilter('remaining', this)">未正解</button>
+        <button class="tab-btn" onclick="setFilter('correct', this)">正解済み</button>
+      </div>
+      <div id="problem-grid" class="problem-grid"></div>
+      <div id="problems-empty" class="empty-state" style="display:none">
+        <div class="empty-state-icon">📷</div>
+        <div class="empty-state-text">まだ問題がありません<br>＋ボタンで写真を撮って<br>問題を登録しましょう</div>
+      </div>
+    </div>
+    <div id="anki-content" style="display:none">
+      <div id="anki-grid" class="anki-grid"></div>
+      <div id="anki-empty" class="empty-state" style="display:none">
+        <div class="empty-state-icon">🃏</div>
+        <div class="empty-state-text">まだ暗記カードがありません<br>＋ボタンで写真を撮って<br>暗記カードを作りましょう</div>
+      </div>
     </div>
     <button class="fab" id="fab-problems" onclick="startCapture()">📷</button>
     <button class="fab" id="fab-quiz" style="right:96px;background:var(--warning)" onclick="showQuizModeModal()">▶</button>
+    <button class="fab" id="fab-anki-add" style="display:none" onclick="startAnkiCapture()">📷</button>
+    <button class="fab" id="fab-anki-study" style="display:none;right:96px;background:var(--success)" onclick="startAnkiStudy()">▶</button>
   </div>
 
   <!-- Screen: Capture -->
@@ -1087,6 +1410,56 @@ body {
     </div>
   </div>
 
+  <!-- Screen: Anki Capture -->
+  <div id="screen-anki-capture" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="cancelAnkiCapture()">‹</button>
+      <h1>暗記カード撮影</h1>
+    </div>
+    <div class="capture-area">
+      <input type="file" accept="image/*" id="anki-file-input" class="hidden-input" onchange="handleAnkiCapture(event)">
+      <img id="anki-capture-preview" class="capture-preview">
+      <div id="anki-capture-initial">
+        <p style="color:var(--text-secondary);margin-bottom:20px;text-align:center">暗記したい内容を撮影または<br>画像を選んでください</p>
+        <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:280px">
+          <button onclick="openAnkiLiveCamera()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;gap:10px">カメラで撮影</button>
+          <button onclick="document.getElementById('anki-file-input').click()" style="padding:18px;border-radius:14px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--card);color:var(--text);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:10px">写真・ファイルから選ぶ</button>
+        </div>
+      </div>
+      <div id="anki-capture-confirm" class="capture-actions" style="display:none">
+        <button class="btn-cancel" onclick="retakeAnkiPhoto()" style="flex:1 1 45%">撮り直す</button>
+        <button class="btn-primary" onclick="openAnkiMaskScreen()" style="flex:1 1 45%">マスクを指定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Anki Study -->
+  <div id="screen-anki-study" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="endAnkiStudy()">✕</button>
+      <h1>暗記モード</h1>
+    </div>
+    <div class="anki-study-container">
+      <div class="anki-study-progress">
+        <div class="quiz-progress-bar">
+          <div id="anki-progress-fill" class="quiz-progress-fill" style="width:0%"></div>
+        </div>
+        <span id="anki-progress-text" class="quiz-progress-text">1 / 1</span>
+      </div>
+      <div class="anki-study-image-container" id="anki-study-image-container">
+        <div class="anki-study-image-wrapper" id="anki-study-wrapper">
+          <img id="anki-study-original" alt="暗記カード">
+          <div id="anki-study-masks" class="anki-study-masks-layer"></div>
+        </div>
+      </div>
+      <div class="anki-study-toggle-hint" id="anki-toggle-hint">マスクをタップして個別に表示/非表示</div>
+      <div class="anki-study-actions">
+        <button class="anki-study-btn" onclick="prevAnkiCard()">◀ 前へ</button>
+        <button class="anki-study-btn" onclick="nextAnkiCard()">次へ ▶</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Add Subject Modal -->
@@ -1138,17 +1511,41 @@ body {
         <strong>① 教科・単元を作る</strong><br>
         <span style="color:var(--text-secondary)">右下の ＋ ボタンから教科を追加し、その中に単元を作ります。</span>
       </div>
-      <div style="margin-bottom:14px">
-        <strong>② 問題を撮影する</strong><br>
-        <span style="color:var(--text-secondary)">📷 ボタンで問題集を撮影。1問ずつ撮るのがおすすめです。トリミングや答えの白塗りもできます。</span>
+
+      <div style="background:#f0f7ff;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:bold;margin-bottom:8px">📝 演習モード</div>
+        <div style="margin-bottom:10px">
+          <strong>② 問題を撮影する</strong><br>
+          <span style="color:var(--text-secondary)">📷 ボタンで問題集を撮影。1問ずつ撮るのがおすすめです。トリミングや答えの白塗りもできます。</span>
+        </div>
+        <div style="margin-bottom:10px">
+          <strong>③ 復習する</strong><br>
+          <span style="color:var(--text-secondary)">▶ ボタンで復習スタート。正解した問題は自動で外れ、間違えた問題だけくりかえし出題されます。</span>
+        </div>
+        <div>
+          <strong>④ 全問正解をめざそう！</strong><br>
+          <span style="color:var(--text-secondary)">すべて正解するまでくりかえし解きましょう。テスト前には「すべての問題」モードで総復習もできます。</span>
+        </div>
       </div>
-      <div style="margin-bottom:14px">
-        <strong>③ 復習する</strong><br>
-        <span style="color:var(--text-secondary)">▶ ボタンで復習スタート。正解した問題は自動で外れ、間違えた問題だけくりかえし出題されます。</span>
+
+      <div style="background:#fff0f0;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:bold;margin-bottom:8px">🔖 暗記モード</div>
+        <div style="margin-bottom:10px">
+          <strong>② 教科書・ノートを撮影する</strong><br>
+          <span style="color:var(--text-secondary)">📷 ボタンで教科書やノートを撮影します。</span>
+        </div>
+        <div style="margin-bottom:10px">
+          <strong>③ 覚えたい箇所をマスクする</strong><br>
+          <span style="color:var(--text-secondary)">重要な用語や公式を指でなぞって隠します。ピンチで拡大しながら細かい箇所もマスクできます。赤・黒・青の3色から選べます。</span>
+        </div>
+        <div>
+          <strong>④ タップして暗記チェック！</strong><br>
+          <span style="color:var(--text-secondary)">マスクをタップすると1つずつ表示/非表示を切り替えられます。覚えるまでくりかえし確認しましょう。</span>
+        </div>
       </div>
-      <div style="margin-bottom:14px">
-        <strong>④ 全問正解をめざそう！</strong><br>
-        <span style="color:var(--text-secondary)">すべて正解するまでくりかえし解きましょう。テスト前には「すべての問題」モードで総復習もできます。</span>
+
+      <div style="margin-bottom:10px;padding:8px 12px;background:#f8f8f8;border-radius:8px;font-size:13px;color:var(--text-secondary)">
+        💡 単元画面の上部で「演習」と「暗記」を切り替えられます。
       </div>
     </div>
     <button type="button" id="tutorial-hide-btn" onclick="toggleHideCheck('tutorial')" style="display:flex;align-items:center;gap:10px;margin:12px 0;padding:12px;font-size:15px;color:var(--text-secondary);cursor:pointer;border:1px solid var(--border);border-radius:8px;background:white;width:100%;text-align:left">
@@ -1314,13 +1711,46 @@ body {
   <div class="crop-instructions">枠の角や辺をドラッグして範囲を調整してください</div>
 </div>
 
+<!-- Anki Mask Overlay -->
+<div id="anki-mask-overlay" class="anki-mask-overlay">
+  <div class="anki-mask-header">
+    <button onclick="cancelAnkiMask()">キャンセル</button>
+    <span style="font-weight:600">マスク指定</span>
+    <button onclick="saveAnkiMask()">完了</button>
+  </div>
+  <div class="anki-mask-canvas-container" id="anki-mask-container" style="position:relative">
+    <div id="anki-mask-zoom-wrapper" style="position:relative;transform-origin:0 0;display:inline-block">
+      <canvas id="anki-mask-base-canvas"></canvas>
+      <canvas id="anki-mask-draw-canvas" style="position:absolute;top:0;left:0"></canvas>
+    </div>
+  </div>
+  <div id="anki-zoom-indicator" style="position:absolute;top:calc(var(--safe-top) + 56px);right:16px;background:rgba(0,0,0,0.6);color:white;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;display:none;z-index:5">x1.0</div>
+  <div class="anki-mask-toolbar">
+    <button class="anki-mask-mode-btn active" id="anki-mode-rect" onclick="setAnkiMaskMode('rect')">矩形</button>
+    <button class="anki-mask-mode-btn" id="anki-mode-pen" onclick="setAnkiMaskMode('pen')">ペン</button>
+    <span style="margin:0 4px;font-size:12px;opacity:0.5">|</span>
+    <button class="anki-mask-color-btn active" id="anki-color-red" style="background:#FF3B30" onclick="setAnkiMaskColor('#FF3B30')"></button>
+    <button class="anki-mask-color-btn" id="anki-color-black" style="background:#1C1C1E" onclick="setAnkiMaskColor('#1C1C1E')"></button>
+    <button class="anki-mask-color-btn" id="anki-color-blue" style="background:#007AFF" onclick="setAnkiMaskColor('#007AFF')"></button>
+    <span style="margin:0 4px;font-size:12px;opacity:0.5">|</span>
+    <span id="anki-pen-sizes" style="display:none;gap:4px">
+      <button class="anki-pen-size-btn" onclick="setAnkiPenSize(15,this)">細</button>
+      <button class="anki-pen-size-btn active" onclick="setAnkiPenSize(30,this)">中</button>
+      <button class="anki-pen-size-btn" onclick="setAnkiPenSize(50,this)">太</button>
+    </span>
+    <button class="anki-mask-tool-btn" onclick="undoAnkiMask()">↩</button>
+    <button class="anki-mask-tool-btn" id="anki-zoom-reset" onclick="resetAnkiZoom()" style="font-size:12px;display:none">1:1</button>
+  </div>
+  <div class="anki-mask-instructions" id="anki-mask-instructions">ドラッグして隠したい部分に矩形を描きます</div>
+</div>
+
 <!-- Context Menu -->
 <div id="context-menu" class="context-menu"></div>
 
 <script>
 // ==================== Database ====================
 const DB_NAME = 'kurikaeshi';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let db;
 
 function openDB() {
@@ -1338,6 +1768,10 @@ function openDB() {
       if (!d.objectStoreNames.contains('problems')) {
         const ps = d.createObjectStore('problems', { keyPath: 'id' });
         ps.createIndex('unitId', 'unitId');
+      }
+      if (!d.objectStoreNames.contains('anki')) {
+        const as = d.createObjectStore('anki', { keyPath: 'id' });
+        as.createIndex('unitId', 'unitId');
       }
     };
     req.onsuccess = e => { db = e.target.result; resolve(db); };
@@ -1412,7 +1846,13 @@ function showScreen(name) {
 
   if (name === 'subjects') renderSubjects();
   else if (name === 'units') renderUnits();
-  else if (name === 'problems') renderProblems();
+  else if (name === 'problems') {
+    if (currentUnitMode === 'anki') {
+      setUnitMode('anki');
+    } else {
+      setUnitMode('drill');
+    }
+  }
 }
 
 // ==================== Subjects ====================
@@ -1535,6 +1975,8 @@ async function deleteSubject(id) {
   for (const u of units) {
     const probs = await dbGetByIndex('problems', 'unitId', u.id);
     for (const p of probs) await dbDelete('problems', p.id);
+    const ankiCards = await dbGetByIndex('anki', 'unitId', u.id);
+    for (const c of ankiCards) await dbDelete('anki', c.id);
     await dbDelete('units', u.id);
   }
   await dbDelete('subjects', id);
@@ -1602,6 +2044,7 @@ async function openUnit(id) {
   currentUnit = units.find(u => u.id === id);
   document.getElementById('problems-title').textContent = currentUnit.name;
   currentFilter = 'all';
+  currentUnitMode = 'drill';
   showScreen('problems');
 }
 
@@ -1636,6 +2079,8 @@ function confirmDeleteUnit(id) {
 async function deleteUnit(id) {
   const probs = await dbGetByIndex('problems', 'unitId', id);
   for (const p of probs) await dbDelete('problems', p.id);
+  const ankiCards = await dbGetByIndex('anki', 'unitId', id);
+  for (const c of ankiCards) await dbDelete('anki', c.id);
   await dbDelete('units', id);
   hideModal('modal-confirm');
   renderUnits();
@@ -1668,19 +2113,21 @@ async function renderProblems() {
     btn.classList.toggle('active', (i === 0 && currentFilter === 'all') || (i === 1 && currentFilter === 'remaining') || (i === 2 && currentFilter === 'correct'));
   });
 
-  // Show/hide quiz button — show whenever there are problems
-  document.getElementById('fab-quiz').style.display = total > 0 ? 'flex' : 'none';
+  // Show/hide quiz button — show whenever there are problems and in drill mode
+  if (currentUnitMode === 'drill') {
+    document.getElementById('fab-quiz').style.display = total > 0 ? 'flex' : 'none';
+  }
 
   if (total === 0) {
     grid.innerHTML = '';
     empty.style.display = 'flex';
-    document.getElementById('btn-select-mode').style.display = 'none';
+    if (currentUnitMode === 'drill') document.getElementById('btn-select-mode').style.display = 'none';
     if (selectMode) exitSelectMode();
     return;
   }
 
   empty.style.display = 'none';
-  document.getElementById('btn-select-mode').style.display = '';
+  if (currentUnitMode === 'drill') document.getElementById('btn-select-mode').style.display = '';
   grid.className = 'problem-grid' + (selectMode ? ' select-mode' : '');
   grid.innerHTML = probs.map((p, i) => `
     <div class="problem-thumb ${p.correct ? 'correct' : ''} ${selectedProblems.has(p.id) ? 'selected' : ''}" onclick="${selectMode ? `toggleSelect('${p.id}')` : `viewProblem('${p.id}')`}" oncontextmenu="showProblemMenu(event,'${p.id}')">
@@ -1704,8 +2151,10 @@ function enterSelectMode() {
   document.getElementById('problems-header-select').style.display = 'flex';
   document.getElementById('fab-problems').style.display = 'none';
   document.getElementById('fab-quiz').style.display = 'none';
+  document.getElementById('fab-anki-add').style.display = 'none';
+  document.getElementById('fab-anki-study').style.display = 'none';
   updateSelectCount();
-  renderProblems();
+  if (currentUnitMode === 'drill') renderProblems(); else renderAnkiCards();
 }
 
 function exitSelectMode() {
@@ -1713,8 +2162,15 @@ function exitSelectMode() {
   selectedProblems.clear();
   document.getElementById('problems-header-normal').style.display = 'flex';
   document.getElementById('problems-header-select').style.display = 'none';
-  document.getElementById('fab-problems').style.display = '';
-  renderProblems();
+  if (currentUnitMode === 'drill') {
+    document.getElementById('fab-problems').style.display = '';
+    document.getElementById('fab-quiz').style.display = '';
+    renderProblems();
+  } else {
+    document.getElementById('fab-anki-add').style.display = 'flex';
+    document.getElementById('fab-anki-study').style.display = 'flex';
+    renderAnkiCards();
+  }
 }
 
 function toggleSelect(id) {
@@ -1724,21 +2180,26 @@ function toggleSelect(id) {
     selectedProblems.add(id);
   }
   updateSelectCount();
-  renderProblems();
+  if (currentUnitMode === 'drill') renderProblems(); else renderAnkiCards();
 }
 
 async function toggleSelectAll() {
-  let probs = await dbGetByIndex('problems', 'unitId', currentUnit.id);
-  if (currentFilter === 'remaining') probs = probs.filter(p => !p.correct);
-  else if (currentFilter === 'correct') probs = probs.filter(p => p.correct);
+  let items;
+  if (currentUnitMode === 'drill') {
+    items = await dbGetByIndex('problems', 'unitId', currentUnit.id);
+    if (currentFilter === 'remaining') items = items.filter(p => !p.correct);
+    else if (currentFilter === 'correct') items = items.filter(p => p.correct);
+  } else {
+    items = await dbGetByIndex('anki', 'unitId', currentUnit.id);
+  }
 
-  if (selectedProblems.size === probs.length) {
+  if (selectedProblems.size === items.length) {
     selectedProblems.clear();
   } else {
-    probs.forEach(p => selectedProblems.add(p.id));
+    items.forEach(p => selectedProblems.add(p.id));
   }
   updateSelectCount();
-  renderProblems();
+  if (currentUnitMode === 'drill') renderProblems(); else renderAnkiCards();
 }
 
 function updateSelectCount() {
@@ -1747,11 +2208,13 @@ function updateSelectCount() {
 
 async function deleteSelected() {
   if (selectedProblems.size === 0) return;
-  document.getElementById('confirm-title').textContent = '問題を削除';
-  document.getElementById('confirm-message').textContent = `選択した${selectedProblems.size}件の問題を削除しますか？`;
+  const isAnki = currentUnitMode === 'anki';
+  document.getElementById('confirm-title').textContent = isAnki ? '暗記カードを削除' : '問題を削除';
+  document.getElementById('confirm-message').textContent = `選択した${selectedProblems.size}件の${isAnki ? '暗記カード' : '問題'}を削除しますか？`;
   document.getElementById('confirm-btn').onclick = async () => {
+    const store = isAnki ? 'anki' : 'problems';
     for (const id of selectedProblems) {
-      await dbDelete('problems', id);
+      await dbDelete(store, id);
     }
     hideModal('modal-confirm');
     exitSelectMode();
@@ -1901,11 +2364,13 @@ function viewProblem(id) {
 
 // ==================== Live Camera ====================
 let cameraStream = null;
+let currentFacingMode = 'environment';
 
 async function openLiveCamera() {
   try {
+    currentFacingMode = 'environment';
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+      video: { facingMode: currentFacingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
     cameraStream = stream;
@@ -1913,36 +2378,64 @@ async function openLiveCamera() {
     document.getElementById('camera-overlay').style.display = 'flex';
     document.getElementById('switch-camera-btn').style.display = 'block';
   } catch (err) {
-    alert('カメラを起動できませんでした。\n「写真・ファイルから選ぶ」をお試しください。');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+      });
+      cameraStream = stream;
+      document.getElementById('camera-video').srcObject = stream;
+      document.getElementById('camera-overlay').style.display = 'flex';
+      document.getElementById('switch-camera-btn').style.display = 'block';
+    } catch (err2) {
+      alert('カメラを起動できませんでした。\n「写真・ファイルから選ぶ」をお試しください。');
+    }
   }
 }
 
 async function switchCamera() {
-  // 現在のカメラを停止
   if (cameraStream) {
     cameraStream.getTracks().forEach(t => t.stop());
     cameraStream = null;
   }
   document.getElementById('camera-video').srcObject = null;
-  // カメラの権限をリセットしてブラウザの選択ダイアログを再表示
-  try {
-    const perm = await navigator.permissions.query({ name: 'camera' });
-    if (perm.state === 'granted') {
-      await navigator.permissions.revoke({ name: 'camera' });
-    }
-  } catch (e) {
-    // permissions.revoke非対応ブラウザは無視
-  }
-  // 再度カメラを要求（ブラウザがカメラ選択ダイアログを表示）
+  currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+      video: { facingMode: { exact: currentFacingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
     cameraStream = stream;
     document.getElementById('camera-video').srcObject = stream;
   } catch (err) {
-    alert('カメラの切り替えに失敗しました。');
+    // facingMode failed, try enumerateDevices
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(d => d.kind === 'videoinput');
+      if (videoDevices.length > 1) {
+        // Try each device until we find a different one
+        for (const dev of videoDevices) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { deviceId: { exact: dev.deviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+              audio: false
+            });
+            cameraStream = stream;
+            document.getElementById('camera-video').srcObject = stream;
+            return;
+          } catch(e) { continue; }
+        }
+      }
+      // If all failed, just re-request without constraints to trigger browser picker
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+      });
+      cameraStream = stream;
+      document.getElementById('camera-video').srcObject = stream;
+    } catch (err2) {
+      alert('カメラの切り替えに失敗しました。');
+    }
   }
 }
 
@@ -2257,8 +2750,19 @@ function applyCrop() {
   out.getContext('2d').drawImage(cropImage, sx, sy, sw, sh, 0, 0, out.width, out.height);
   const dataUrl = out.toDataURL('image/jpeg', 0.85);
 
-  capturedImages = [dataUrl];
   document.getElementById('crop-overlay').classList.remove('active');
+
+  // Route to anki capture if in anki mode
+  if (ankiIsCapturing) {
+    ankiCapturedImage = dataUrl;
+    document.getElementById('anki-capture-preview').src = dataUrl;
+    document.getElementById('anki-capture-preview').style.display = 'block';
+    document.getElementById('anki-capture-initial').style.display = 'none';
+    document.getElementById('anki-capture-confirm').style.display = 'flex';
+    return;
+  }
+
+  capturedImages = [dataUrl];
 
   document.getElementById('capture-preview').src = dataUrl;
   document.getElementById('capture-preview').style.display = 'block';
@@ -2269,6 +2773,10 @@ function applyCrop() {
 function cancelCrop() {
   document.getElementById('crop-overlay').classList.remove('active');
   cropImage = null;
+  if (ankiIsCapturing) {
+    // Stay on anki capture screen
+    return;
+  }
   if (multiCropMode && multiCropCount > 0) {
     multiCropMode = false;
     originalCropImage = null;
@@ -2587,6 +3095,966 @@ async function retryWrong() {
   quizResults = [];
   showScreen('quiz');
   showQuizProblem();
+}
+
+// ==================== Anki Mode ====================
+let currentUnitMode = 'drill';
+let ankiCapturedImage = null;
+let ankiMaskMode = 'rect'; // 'rect' or 'pen'
+let ankiMaskColor = '#FF3B30';
+let ankiPenSize = 30;
+let ankiMaskHistory = [];
+let ankiMaskDrawing = false;
+let ankiStudyCards = [];
+let ankiStudyIndex = 0;
+let ankiMaskVisible = true;
+let ankiIsCapturing = false;
+let ankiEditingCardId = null;
+// Zoom
+let ankiZoomScale = 1;
+let ankiZoomPanX = 0;
+let ankiZoomPanY = 0;
+let ankiPinchActive = false;
+let ankiPinchStartDist = 0;
+let ankiPinchStartScale = 1;
+let ankiPinchStartMid = null;
+let ankiPinchStartPanX = 0;
+let ankiPinchStartPanY = 0;
+// Rect objects
+let ankiMaskRects = [];
+let ankiSelectedRectIdx = -1;
+let ankiDragInfo = null;
+// Pen separate canvas
+let ankiPenCanvas = null;
+let ankiPenCtx = null;
+
+function setUnitMode(mode) {
+  currentUnitMode = mode;
+  document.getElementById('mode-tab-drill').classList.toggle('active', mode === 'drill');
+  document.getElementById('mode-tab-anki').classList.toggle('active', mode === 'anki');
+  document.getElementById('drill-content').style.display = mode === 'drill' ? '' : 'none';
+  document.getElementById('anki-content').style.display = mode === 'anki' ? '' : 'none';
+  document.getElementById('fab-problems').style.display = mode === 'drill' && !selectMode ? '' : 'none';
+  document.getElementById('fab-quiz').style.display = mode === 'drill' ? '' : 'none';
+  document.getElementById('fab-anki-add').style.display = mode === 'anki' ? 'flex' : 'none';
+  document.getElementById('fab-anki-study').style.display = mode === 'anki' ? 'flex' : 'none';
+  document.getElementById('btn-select-mode').style.display = selectMode ? 'none' : '';
+  if (mode === 'anki') {
+    renderAnkiCards();
+  } else {
+    renderProblems();
+  }
+}
+
+async function renderAnkiCards() {
+  const grid = document.getElementById('anki-grid');
+  const empty = document.getElementById('anki-empty');
+  let cards = await dbGetByIndex('anki', 'unitId', currentUnit.id);
+  cards.sort((a, b) => a.order - b.order);
+
+  document.getElementById('fab-anki-study').style.display = cards.length > 0 ? 'flex' : 'none';
+
+  if (cards.length === 0) {
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    empty.style.display = 'flex';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.style.display = '';
+  grid.innerHTML = cards.map((c, i) => `
+    <div class="anki-thumb ${selectedProblems.has(c.id) ? 'selected' : ''}" onclick="${selectMode ? `toggleSelect('${c.id}')` : `viewAnkiCard('${c.id}')`}" oncontextmenu="showAnkiCardMenu(event,'${c.id}')">
+      <img src="${c.originalImage}" alt="暗記カード${i + 1}" loading="lazy">
+      <span class="anki-thumb-badge">🃏</span>
+      <div class="anki-thumb-number">${i + 1}</div>
+    </div>`
+  ).join('');
+}
+
+function viewAnkiCard(id) {
+  dbGetByIndex('anki', 'unitId', currentUnit.id).then(cards => {
+    const c = cards.find(x => x.id === id);
+    if (!c) return;
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:290;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;';
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative;display:inline-block;max-width:100%;max-height:60vh;';
+    const origImg = document.createElement('img');
+    origImg.src = c.originalImage;
+    origImg.style.cssText = 'max-width:100%;max-height:60vh;object-fit:contain;border-radius:8px;display:block;';
+    wrapper.appendChild(origImg);
+    const maskImg = document.createElement('img');
+    maskImg.src = c.maskImage;
+    maskImg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;cursor:pointer;';
+    let maskOn = true;
+    maskImg.onclick = (e) => { e.stopPropagation(); maskOn = !maskOn; maskImg.style.opacity = maskOn ? '1' : '0'; };
+    wrapper.appendChild(maskImg);
+    overlay.appendChild(wrapper);
+    const hint = document.createElement('div');
+    hint.textContent = 'タップでマスクを表示/非表示';
+    hint.style.cssText = 'color:rgba(255,255,255,0.6);font-size:13px;margin-top:12px;';
+    overlay.appendChild(hint);
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'マスクを編集';
+    editBtn.style.cssText = 'background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px;';
+    editBtn.onclick = () => { overlay.remove(); editAnkiCardMask(id); };
+    overlay.appendChild(editBtn);
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '閉じる';
+    closeBtn.style.cssText = 'background:rgba(255,255,255,0.2);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:16px;';
+    closeBtn.onclick = () => overlay.remove();
+    overlay.appendChild(closeBtn);
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    document.body.appendChild(overlay);
+  });
+}
+
+async function editAnkiCardMask(id) {
+  const cards = await dbGetByIndex('anki', 'unitId', currentUnit.id);
+  const c = cards.find(x => x.id === id);
+  if (!c) return;
+  ankiEditingCardId = id;
+  ankiCapturedImage = c.originalImage;
+  openAnkiMaskScreen();
+
+  // Restore existing masks after canvas is ready
+  setTimeout(() => {
+    if (c.maskRects && c.maskRects.length > 0) {
+      const scale = ankiDrawCanvas._scale;
+      ankiMaskRects = c.maskRects.map(r => ({
+        x: r.x * scale, y: r.y * scale,
+        w: r.w * scale, h: r.h * scale,
+        color: r.color
+      }));
+    }
+    if (c.penMaskImage) {
+      const penImg = new Image();
+      penImg.onload = () => {
+        ankiPenCtx.drawImage(penImg, 0, 0, ankiPenCanvas.width, ankiPenCanvas.height);
+        renderAnkiMask();
+        pushAnkiHistory();
+      };
+      penImg.src = c.penMaskImage;
+    } else {
+      renderAnkiMask();
+      pushAnkiHistory();
+    }
+  }, 200);
+}
+
+function showAnkiCardMenu(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  showContextMenu(e, [
+    { label: '🗑 削除', danger: true, action: () => confirmDeleteAnkiCard(id) }
+  ]);
+}
+
+function confirmDeleteAnkiCard(id) {
+  document.getElementById('confirm-title').textContent = '暗記カードを削除';
+  document.getElementById('confirm-message').textContent = 'この暗記カードを削除しますか？';
+  document.getElementById('confirm-btn').onclick = async () => {
+    await dbDelete('anki', id);
+    hideModal('modal-confirm');
+    renderAnkiCards();
+  };
+  document.getElementById('modal-confirm').classList.add('active');
+}
+
+// --- Anki Capture ---
+function startAnkiCapture() {
+  ankiCapturedImage = null;
+  ankiIsCapturing = true;
+  document.getElementById('anki-capture-preview').style.display = 'none';
+  document.getElementById('anki-capture-initial').style.display = 'block';
+  document.getElementById('anki-capture-confirm').style.display = 'none';
+  document.getElementById('anki-file-input').value = '';
+  showScreen('anki-capture');
+}
+
+function cancelAnkiCapture() {
+  ankiCapturedImage = null;
+  ankiIsCapturing = false;
+  showScreen('problems');
+  setUnitMode('anki');
+}
+
+function openAnkiLiveCamera() {
+  openLiveCamera();
+}
+
+function handleAnkiCapture(e) {
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
+  loadImageFromFile(files[0]).then(img => {
+    originalCropImage = img;
+    multiCropCount = 0;
+    openCropScreen(img);
+  });
+}
+
+function retakeAnkiPhoto() {
+  ankiCapturedImage = null;
+  document.getElementById('anki-capture-preview').style.display = 'none';
+  document.getElementById('anki-capture-initial').style.display = 'block';
+  document.getElementById('anki-capture-confirm').style.display = 'none';
+  document.getElementById('anki-file-input').value = '';
+}
+
+// --- Anki Mask ---
+let ankiBaseCanvas, ankiBaseCtx, ankiDrawCanvas, ankiDrawCtx, ankiOriginalImg;
+
+function openAnkiMaskScreen() {
+  if (!ankiCapturedImage) return;
+  const overlay = document.getElementById('anki-mask-overlay');
+  ankiBaseCanvas = document.getElementById('anki-mask-base-canvas');
+  ankiBaseCtx = ankiBaseCanvas.getContext('2d');
+  ankiDrawCanvas = document.getElementById('anki-mask-draw-canvas');
+  ankiDrawCtx = ankiDrawCanvas.getContext('2d');
+  const container = document.getElementById('anki-mask-container');
+
+  ankiMaskMode = 'rect';
+  ankiMaskColor = '#FF3B30';
+  ankiMaskRects = [];
+  ankiSelectedRectIdx = -1;
+  ankiDragInfo = null;
+  ankiMaskHistory = [];
+  ankiZoomScale = 1;
+  ankiZoomPanX = 0;
+  ankiZoomPanY = 0;
+
+  document.getElementById('anki-mode-rect').classList.add('active');
+  document.getElementById('anki-mode-pen').classList.remove('active');
+  document.getElementById('anki-color-red').classList.add('active');
+  document.getElementById('anki-color-black').classList.remove('active');
+  document.getElementById('anki-color-blue').classList.remove('active');
+  document.getElementById('anki-pen-sizes').style.display = 'none';
+  document.getElementById('anki-mask-instructions').textContent = 'ドラッグして隠したい部分に矩形を描きます';
+  document.getElementById('anki-zoom-indicator').style.display = 'none';
+  document.getElementById('anki-zoom-reset').style.display = 'none';
+
+  overlay.classList.add('active');
+
+  const img = new Image();
+  img.onload = () => {
+    ankiOriginalImg = img;
+    requestAnimationFrame(() => {
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      const scale = Math.min(cw / img.width, ch / img.height);
+      const cWidth = Math.floor(img.width * scale);
+      const cHeight = Math.floor(img.height * scale);
+      ankiBaseCanvas.width = cWidth;
+      ankiBaseCanvas.height = cHeight;
+      ankiBaseCanvas._scale = scale;
+      ankiDrawCanvas.width = cWidth;
+      ankiDrawCanvas.height = cHeight;
+      ankiDrawCanvas._scale = scale;
+      ankiDrawCanvas.style.width = cWidth + 'px';
+      ankiDrawCanvas.style.height = cHeight + 'px';
+
+      ankiBaseCtx.drawImage(img, 0, 0, cWidth, cHeight);
+      ankiDrawCtx.clearRect(0, 0, cWidth, cHeight);
+
+      // Create pen canvas
+      ankiPenCanvas = document.createElement('canvas');
+      ankiPenCanvas.width = cWidth;
+      ankiPenCanvas.height = cHeight;
+      ankiPenCtx = ankiPenCanvas.getContext('2d');
+
+      // Apply zoom
+      applyAnkiZoom();
+
+      // Save initial history
+      pushAnkiHistory();
+    });
+  };
+  img.src = ankiCapturedImage;
+}
+
+function getAnkiNaturalOffset() {
+  const container = document.getElementById('anki-mask-container');
+  return {
+    x: (container.clientWidth - ankiBaseCanvas.width) / 2,
+    y: (container.clientHeight - ankiBaseCanvas.height) / 2
+  };
+}
+
+function applyAnkiZoom() {
+  const wrapper = document.getElementById('anki-mask-zoom-wrapper');
+  wrapper.style.transform = `translate(${ankiZoomPanX}px, ${ankiZoomPanY}px) scale(${ankiZoomScale})`;
+  const indicator = document.getElementById('anki-zoom-indicator');
+  const resetBtn = document.getElementById('anki-zoom-reset');
+  if (ankiZoomScale > 1.05) {
+    indicator.textContent = 'x' + ankiZoomScale.toFixed(1);
+    indicator.style.display = 'block';
+    resetBtn.style.display = '';
+  } else {
+    indicator.style.display = 'none';
+    resetBtn.style.display = 'none';
+  }
+}
+
+function resetAnkiZoom() {
+  ankiZoomScale = 1;
+  ankiZoomPanX = 0;
+  ankiZoomPanY = 0;
+  applyAnkiZoom();
+}
+
+function renderAnkiMask() {
+  ankiDrawCtx.clearRect(0, 0, ankiDrawCanvas.width, ankiDrawCanvas.height);
+
+  // Draw pen strokes
+  if (ankiPenCanvas) {
+    ankiDrawCtx.drawImage(ankiPenCanvas, 0, 0);
+  }
+
+  // Draw all rects
+  ankiMaskRects.forEach((r, i) => {
+    ankiDrawCtx.fillStyle = r.color;
+    ankiDrawCtx.fillRect(r.x, r.y, r.w, r.h);
+  });
+
+  // Draw handles for selected rect
+  if (ankiSelectedRectIdx >= 0 && ankiSelectedRectIdx < ankiMaskRects.length) {
+    const r = ankiMaskRects[ankiSelectedRectIdx];
+    // Dashed border
+    ankiDrawCtx.save();
+    ankiDrawCtx.strokeStyle = 'white';
+    ankiDrawCtx.lineWidth = 2;
+    ankiDrawCtx.setLineDash([6, 4]);
+    ankiDrawCtx.strokeRect(r.x, r.y, r.w, r.h);
+    ankiDrawCtx.setLineDash([]);
+
+    // Draw 8 handles
+    const hs = 10 / ankiZoomScale; // handle size adjusts with zoom
+    const handles = getAnkiRectHandles(r);
+    handles.forEach(h => {
+      ankiDrawCtx.fillStyle = 'white';
+      ankiDrawCtx.fillRect(h.x - hs/2, h.y - hs/2, hs, hs);
+      ankiDrawCtx.strokeStyle = '#007AFF';
+      ankiDrawCtx.lineWidth = 1.5;
+      ankiDrawCtx.strokeRect(h.x - hs/2, h.y - hs/2, hs, hs);
+    });
+    ankiDrawCtx.restore();
+  }
+}
+
+function getAnkiRectHandles(r) {
+  return [
+    { name: 'tl', x: r.x, y: r.y },
+    { name: 'tr', x: r.x + r.w, y: r.y },
+    { name: 'bl', x: r.x, y: r.y + r.h },
+    { name: 'br', x: r.x + r.w, y: r.y + r.h },
+    { name: 't', x: r.x + r.w/2, y: r.y },
+    { name: 'b', x: r.x + r.w/2, y: r.y + r.h },
+    { name: 'l', x: r.x, y: r.y + r.h/2 },
+    { name: 'r', x: r.x + r.w, y: r.y + r.h/2 }
+  ];
+}
+
+function hitTestAnkiHandle(pos) {
+  if (ankiSelectedRectIdx < 0) return null;
+  const r = ankiMaskRects[ankiSelectedRectIdx];
+  const handles = getAnkiRectHandles(r);
+  const threshold = 18 / ankiZoomScale;
+  for (const h of handles) {
+    if (Math.abs(pos.x - h.x) < threshold && Math.abs(pos.y - h.y) < threshold) {
+      return h.name;
+    }
+  }
+  return null;
+}
+
+function hitTestAnkiRect(pos) {
+  // Check from last to first (topmost rect first)
+  for (let i = ankiMaskRects.length - 1; i >= 0; i--) {
+    const r = ankiMaskRects[i];
+    const rx = Math.min(r.x, r.x + r.w);
+    const ry = Math.min(r.y, r.y + r.h);
+    const rw = Math.abs(r.w);
+    const rh = Math.abs(r.h);
+    if (pos.x >= rx && pos.x <= rx + rw && pos.y >= ry && pos.y <= ry + rh) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function pushAnkiHistory() {
+  ankiMaskHistory.push({
+    rects: ankiMaskRects.map(r => ({ ...r })),
+    penData: ankiPenCtx ? ankiPenCtx.getImageData(0, 0, ankiPenCanvas.width, ankiPenCanvas.height) : null
+  });
+}
+
+function setAnkiMaskMode(mode) {
+  ankiMaskMode = mode;
+  ankiSelectedRectIdx = -1;
+  renderAnkiMask();
+  document.getElementById('anki-mode-rect').classList.toggle('active', mode === 'rect');
+  document.getElementById('anki-mode-pen').classList.toggle('active', mode === 'pen');
+  document.getElementById('anki-pen-sizes').style.display = mode === 'pen' ? 'flex' : 'none';
+  document.getElementById('anki-mask-instructions').textContent =
+    mode === 'rect' ? 'ドラッグして隠したい部分に矩形を描きます' : '指でなぞって隠したい部分を塗りつぶします';
+}
+
+function setAnkiMaskColor(color) {
+  ankiMaskColor = color;
+  document.getElementById('anki-color-red').classList.toggle('active', color === '#FF3B30');
+  document.getElementById('anki-color-black').classList.toggle('active', color === '#1C1C1E');
+  document.getElementById('anki-color-blue').classList.toggle('active', color === '#007AFF');
+  // Update selected rect color if any
+  if (ankiSelectedRectIdx >= 0 && ankiSelectedRectIdx < ankiMaskRects.length) {
+    ankiMaskRects[ankiSelectedRectIdx].color = color;
+    renderAnkiMask();
+    pushAnkiHistory();
+  }
+}
+
+function setAnkiPenSize(size, btn) {
+  ankiPenSize = size;
+  document.querySelectorAll('.anki-pen-size-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function undoAnkiMask() {
+  if (ankiMaskHistory.length <= 1) return;
+  ankiMaskHistory.pop();
+  const prev = ankiMaskHistory[ankiMaskHistory.length - 1];
+  ankiMaskRects = prev.rects.map(r => ({ ...r }));
+  if (prev.penData && ankiPenCtx) {
+    ankiPenCtx.putImageData(prev.penData, 0, 0);
+  }
+  ankiSelectedRectIdx = -1;
+  renderAnkiMask();
+}
+
+function getAnkiMaskPos(e) {
+  const rect = ankiDrawCanvas.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return {
+    x: (touch.clientX - rect.left) * (ankiDrawCanvas.width / rect.width),
+    y: (touch.clientY - rect.top) * (ankiDrawCanvas.height / rect.height)
+  };
+}
+
+function getPinchDist(e) {
+  const dx = e.touches[0].clientX - e.touches[1].clientX;
+  const dy = e.touches[0].clientY - e.touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function getPinchMid(e) {
+  return {
+    x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+    y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+  };
+}
+
+(function setupAnkiMaskEvents() {
+  const canvas = document.getElementById('anki-mask-draw-canvas');
+  const container = document.getElementById('anki-mask-container');
+  let lastPenPos = null;
+  let rectStartPos = null;
+  let isNewRect = false;
+  let longPressTimer = null;
+  let longPressTriggered = false;
+
+  function startPinch(e) {
+    ankiPinchActive = true;
+    ankiMaskDrawing = false;
+    ankiPinchStartDist = getPinchDist(e);
+    ankiPinchStartScale = ankiZoomScale;
+    ankiPinchStartMid = getPinchMid(e);
+    ankiPinchStartPanX = ankiZoomPanX;
+    ankiPinchStartPanY = ankiZoomPanY;
+  }
+
+  function movePinch(e) {
+    const newDist = getPinchDist(e);
+    const newMid = getPinchMid(e);
+    let newScale = ankiPinchStartScale * (newDist / ankiPinchStartDist);
+    newScale = Math.max(1, Math.min(newScale, 6));
+
+    // Compute pinch midpoint in wrapper-local coords at pinch start
+    const nat = getAnkiNaturalOffset();
+    const containerRect = container.getBoundingClientRect();
+    const relX = ankiPinchStartMid.x - containerRect.left - nat.x;
+    const relY = ankiPinchStartMid.y - containerRect.top - nat.y;
+    // Wrapper-local point under pinch start: (relX - startPan) / startScale
+    const wx = (relX - ankiPinchStartPanX) / ankiPinchStartScale;
+    const wy = (relY - ankiPinchStartPanY) / ankiPinchStartScale;
+    // New pan to keep that point under the (moved) midpoint
+    const newRelX = newMid.x - containerRect.left - nat.x;
+    const newRelY = newMid.y - containerRect.top - nat.y;
+    ankiZoomPanX = newRelX - wx * newScale;
+    ankiZoomPanY = newRelY - wy * newScale;
+    ankiZoomScale = newScale;
+    clampAnkiPan();
+    applyAnkiZoom();
+  }
+
+  function onStart(e) {
+    // Pinch zoom (2 fingers)
+    if (e.touches && e.touches.length >= 2) {
+      e.preventDefault();
+      startPinch(e);
+      return;
+    }
+
+    if (ankiPinchActive) return;
+    e.preventDefault();
+    const pos = getAnkiMaskPos(e);
+
+    if (ankiMaskMode === 'rect') {
+      // Check if tapping a handle of selected rect
+      const handle = hitTestAnkiHandle(pos);
+      if (handle) {
+        const r = ankiMaskRects[ankiSelectedRectIdx];
+        ankiDragInfo = { type: 'handle', handleName: handle, startRect: { ...r }, startPos: pos };
+        ankiMaskDrawing = true;
+        return;
+      }
+      // Check if tapping inside selected rect (move)
+      if (ankiSelectedRectIdx >= 0) {
+        const r = ankiMaskRects[ankiSelectedRectIdx];
+        const rx = Math.min(r.x, r.x + r.w);
+        const ry = Math.min(r.y, r.y + r.h);
+        const rw = Math.abs(r.w);
+        const rh = Math.abs(r.h);
+        if (pos.x >= rx && pos.x <= rx + rw && pos.y >= ry && pos.y <= ry + rh) {
+          ankiDragInfo = { type: 'move', startRect: { ...r }, startPos: pos };
+          ankiMaskDrawing = true;
+          longPressTriggered = false;
+          longPressTimer = setTimeout(() => {
+            longPressTriggered = true;
+            ankiMaskDrawing = false;
+            ankiDragInfo = null;
+            if (confirm('このマスクを削除しますか？')) {
+              ankiMaskRects.splice(ankiSelectedRectIdx, 1);
+              ankiSelectedRectIdx = -1;
+              pushAnkiHistory();
+            }
+            renderAnkiMask();
+          }, 500);
+          return;
+        }
+      }
+      // Check if tapping another rect to select it
+      const hitIdx = hitTestAnkiRect(pos);
+      if (hitIdx >= 0) {
+        ankiSelectedRectIdx = hitIdx;
+        renderAnkiMask();
+        ankiDragInfo = { type: 'move', startRect: { ...ankiMaskRects[hitIdx] }, startPos: pos };
+        ankiMaskDrawing = true;
+        longPressTriggered = false;
+        longPressTimer = setTimeout(() => {
+          longPressTriggered = true;
+          ankiMaskDrawing = false;
+          ankiDragInfo = null;
+          if (confirm('このマスクを削除しますか？')) {
+            ankiMaskRects.splice(ankiSelectedRectIdx, 1);
+            ankiSelectedRectIdx = -1;
+            pushAnkiHistory();
+          }
+          renderAnkiMask();
+        }, 500);
+        return;
+      }
+      // Deselect and start new rect
+      ankiSelectedRectIdx = -1;
+      rectStartPos = pos;
+      isNewRect = true;
+      ankiMaskDrawing = true;
+    } else {
+      // Pen mode
+      lastPenPos = pos;
+      ankiMaskDrawing = true;
+      ankiPenCtx.fillStyle = ankiMaskColor;
+      ankiPenCtx.beginPath();
+      ankiPenCtx.arc(pos.x, pos.y, ankiPenSize / 2, 0, Math.PI * 2);
+      ankiPenCtx.fill();
+      renderAnkiMask();
+    }
+  }
+
+  function onMove(e) {
+    // Pinch zoom
+    if (ankiPinchActive && e.touches && e.touches.length >= 2) {
+      e.preventDefault();
+      movePinch(e);
+      return;
+    }
+
+    if (!ankiMaskDrawing || ankiPinchActive) return;
+    e.preventDefault();
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    const pos = getAnkiMaskPos(e);
+
+    if (ankiMaskMode === 'rect') {
+      if (ankiDragInfo) {
+        const r = ankiMaskRects[ankiSelectedRectIdx];
+        const sr = ankiDragInfo.startRect;
+        const dx = pos.x - ankiDragInfo.startPos.x;
+        const dy = pos.y - ankiDragInfo.startPos.y;
+
+        if (ankiDragInfo.type === 'move') {
+          r.x = sr.x + dx;
+          r.y = sr.y + dy;
+        } else if (ankiDragInfo.type === 'handle') {
+          const h = ankiDragInfo.handleName;
+          if (h === 'tl') { r.x = sr.x + dx; r.y = sr.y + dy; r.w = sr.w - dx; r.h = sr.h - dy; }
+          else if (h === 'tr') { r.y = sr.y + dy; r.w = sr.w + dx; r.h = sr.h - dy; }
+          else if (h === 'bl') { r.x = sr.x + dx; r.w = sr.w - dx; r.h = sr.h + dy; }
+          else if (h === 'br') { r.w = sr.w + dx; r.h = sr.h + dy; }
+          else if (h === 't') { r.y = sr.y + dy; r.h = sr.h - dy; }
+          else if (h === 'b') { r.h = sr.h + dy; }
+          else if (h === 'l') { r.x = sr.x + dx; r.w = sr.w - dx; }
+          else if (h === 'r') { r.w = sr.w + dx; }
+        }
+        renderAnkiMask();
+      } else if (isNewRect && rectStartPos) {
+        // Drawing new rect preview
+        const x = Math.min(rectStartPos.x, pos.x);
+        const y = Math.min(rectStartPos.y, pos.y);
+        const w = Math.abs(pos.x - rectStartPos.x);
+        const h = Math.abs(pos.y - rectStartPos.y);
+        // Temporarily add rect for preview
+        if (ankiMaskRects.length > 0 && ankiMaskRects[ankiMaskRects.length - 1]._preview) {
+          ankiMaskRects[ankiMaskRects.length - 1] = { x, y, w, h, color: ankiMaskColor, _preview: true };
+        } else {
+          ankiMaskRects.push({ x, y, w, h, color: ankiMaskColor, _preview: true });
+        }
+        renderAnkiMask();
+      }
+    } else if (ankiMaskMode === 'pen' && lastPenPos) {
+      ankiPenCtx.fillStyle = ankiMaskColor;
+      const dx = pos.x - lastPenPos.x;
+      const dy = pos.y - lastPenPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const steps = Math.max(1, Math.floor(dist / (ankiPenSize / 4)));
+      for (let i = 1; i <= steps; i++) {
+        ankiPenCtx.beginPath();
+        ankiPenCtx.arc(
+          lastPenPos.x + dx * (i / steps),
+          lastPenPos.y + dy * (i / steps),
+          ankiPenSize / 2, 0, Math.PI * 2
+        );
+        ankiPenCtx.fill();
+      }
+      lastPenPos = pos;
+      renderAnkiMask();
+    }
+  }
+
+  function onEnd(e) {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    if (longPressTriggered) {
+      longPressTriggered = false;
+      return;
+    }
+    if (ankiPinchActive) {
+      if (!e.touches || e.touches.length < 2) {
+        ankiPinchActive = false;
+      }
+      return;
+    }
+    if (!ankiMaskDrawing) return;
+    ankiMaskDrawing = false;
+
+    if (ankiMaskMode === 'rect') {
+      if (isNewRect) {
+        // Finalize new rect
+        const lastRect = ankiMaskRects[ankiMaskRects.length - 1];
+        if (lastRect && lastRect._preview) {
+          delete lastRect._preview;
+          if (Math.abs(lastRect.w) > 3 && Math.abs(lastRect.h) > 3) {
+            // Normalize negative width/height
+            if (lastRect.w < 0) { lastRect.x += lastRect.w; lastRect.w = -lastRect.w; }
+            if (lastRect.h < 0) { lastRect.y += lastRect.h; lastRect.h = -lastRect.h; }
+            ankiSelectedRectIdx = ankiMaskRects.length - 1;
+            pushAnkiHistory();
+          } else {
+            ankiMaskRects.pop(); // too small, remove
+          }
+        }
+        isNewRect = false;
+        rectStartPos = null;
+      } else if (ankiDragInfo) {
+        pushAnkiHistory();
+        ankiDragInfo = null;
+      }
+      renderAnkiMask();
+    } else {
+      // Pen mode
+      lastPenPos = null;
+      pushAnkiHistory();
+    }
+  }
+
+  canvas.addEventListener('mousedown', onStart);
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('mouseup', onEnd);
+  canvas.addEventListener('touchstart', onStart, { passive: false });
+  canvas.addEventListener('touchmove', onMove, { passive: false });
+  canvas.addEventListener('touchend', onEnd);
+
+  // Also handle pinch on container for when touches are outside canvas
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length >= 2) {
+      e.preventDefault();
+      startPinch(e);
+    }
+  }, { passive: false });
+  container.addEventListener('touchmove', (e) => {
+    if (ankiPinchActive && e.touches.length >= 2) {
+      e.preventDefault();
+      movePinch(e);
+    }
+  }, { passive: false });
+  container.addEventListener('touchend', (e) => {
+    if (ankiPinchActive && (!e.touches || e.touches.length < 2)) {
+      ankiPinchActive = false;
+    }
+  });
+})();
+
+function clampAnkiPan() {
+  if (ankiZoomScale <= 1) {
+    ankiZoomPanX = 0;
+    ankiZoomPanY = 0;
+    return;
+  }
+  // The wrapper is centered in the container by flex.
+  // With transform: translate(panX, panY) scale(s) and origin 0 0:
+  //   wrapper's left edge visual pos (relative to natural center pos) = panX
+  //   wrapper's right edge visual pos = panX + canvasWidth * scale
+  // We want to keep the image within the container viewport.
+  const nat = getAnkiNaturalOffset();
+  const cw = document.getElementById('anki-mask-container').clientWidth;
+  const ch = document.getElementById('anki-mask-container').clientHeight;
+  const sw = ankiBaseCanvas.width * ankiZoomScale;
+  const sh = ankiBaseCanvas.height * ankiZoomScale;
+
+  // The visible area in the container goes from 0 to cw (in container coords).
+  // The wrapper's natural left = nat.x, so the image left edge = nat.x + panX
+  // Image right edge = nat.x + panX + sw
+  // Constraint: image right edge >= cw => panX >= cw - nat.x - sw
+  // Constraint: image left edge <= 0 => panX <= -nat.x (but nat.x could be 0 at scale=1)
+  // Actually we want: image must cover the container (don't show black gaps)
+  // If sw > cw: left edge <= 0 and right edge >= cw (relative to container)
+  //   nat.x + panX <= 0  =>  panX <= -nat.x
+  //   nat.x + panX + sw >= cw  =>  panX >= cw - nat.x - sw
+  // If sw <= cw: center the image (panX so it's centered)
+  if (sw > cw) {
+    const minPanX = cw - nat.x - sw;
+    const maxPanX = -nat.x;
+    ankiZoomPanX = Math.max(minPanX, Math.min(maxPanX, ankiZoomPanX));
+  } else {
+    ankiZoomPanX = (cw - sw) / 2 - nat.x;
+  }
+  if (sh > ch) {
+    const minPanY = ch - nat.y - sh;
+    const maxPanY = -nat.y;
+    ankiZoomPanY = Math.max(minPanY, Math.min(maxPanY, ankiZoomPanY));
+  } else {
+    ankiZoomPanY = (ch - sh) / 2 - nat.y;
+  }
+}
+
+async function saveAnkiMask() {
+  // Deselect before saving
+  ankiSelectedRectIdx = -1;
+  renderAnkiMask();
+
+  // Generate combined mask image at original resolution (for thumbnails & backward compat)
+  const scale = ankiDrawCanvas._scale;
+  const maskOut = document.createElement('canvas');
+  maskOut.width = ankiOriginalImg.width;
+  maskOut.height = ankiOriginalImg.height;
+  const maskOutCtx = maskOut.getContext('2d');
+  maskOutCtx.drawImage(ankiDrawCanvas, 0, 0, ankiDrawCanvas.width, ankiDrawCanvas.height, 0, 0, maskOut.width, maskOut.height);
+  const maskDataUrl = maskOut.toDataURL('image/png');
+
+  // Save rects in original image coordinates
+  const rectsForSave = ankiMaskRects.map(r => ({
+    x: r.x / scale,
+    y: r.y / scale,
+    w: r.w / scale,
+    h: r.h / scale,
+    color: r.color
+  }));
+
+  // Generate pen-only mask image (if pen strokes exist)
+  let penMaskDataUrl = null;
+  if (ankiPenCanvas && ankiPenCtx) {
+    const penData = ankiPenCtx.getImageData(0, 0, ankiPenCanvas.width, ankiPenCanvas.height);
+    const hasPen = penData.data.some((v, i) => i % 4 === 3 && v > 0);
+    if (hasPen) {
+      const penOut = document.createElement('canvas');
+      penOut.width = ankiOriginalImg.width;
+      penOut.height = ankiOriginalImg.height;
+      const penOutCtx = penOut.getContext('2d');
+      penOutCtx.drawImage(ankiPenCanvas, 0, 0, ankiPenCanvas.width, ankiPenCanvas.height, 0, 0, penOut.width, penOut.height);
+      penMaskDataUrl = penOut.toDataURL('image/png');
+    }
+  }
+
+  // Save to DB
+  if (ankiEditingCardId) {
+    // Update existing card
+    const existingCards = await dbGetByIndex('anki', 'unitId', currentUnit.id);
+    const existing = existingCards.find(x => x.id === ankiEditingCardId);
+    await dbPut('anki', {
+      id: ankiEditingCardId,
+      unitId: currentUnit.id,
+      originalImage: ankiCapturedImage,
+      maskImage: maskDataUrl,
+      maskRects: rectsForSave,
+      penMaskImage: penMaskDataUrl,
+      maskColor: ankiMaskColor,
+      order: existing ? existing.order : 0,
+      createdAt: existing ? existing.createdAt : Date.now()
+    });
+    ankiEditingCardId = null;
+  } else {
+    // Create new card
+    const cards = await dbGetByIndex('anki', 'unitId', currentUnit.id);
+    await dbPut('anki', {
+      id: 'anki_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      unitId: currentUnit.id,
+      originalImage: ankiCapturedImage,
+      maskImage: maskDataUrl,
+      maskRects: rectsForSave,
+      penMaskImage: penMaskDataUrl,
+      maskColor: ankiMaskColor,
+      order: cards.length,
+      createdAt: Date.now()
+    });
+  }
+
+  document.getElementById('anki-mask-overlay').classList.remove('active');
+  ankiCapturedImage = null;
+  ankiIsCapturing = false;
+  ankiMaskHistory = [];
+  ankiMaskRects = [];
+  ankiPenCanvas = null;
+  ankiPenCtx = null;
+  resetAnkiZoom();
+  showScreen('problems');
+  setUnitMode('anki');
+}
+
+function cancelAnkiMask() {
+  document.getElementById('anki-mask-overlay').classList.remove('active');
+  ankiMaskHistory = [];
+  ankiMaskRects = [];
+  ankiSelectedRectIdx = -1;
+  ankiPenCanvas = null;
+  ankiPenCtx = null;
+  resetAnkiZoom();
+}
+
+// --- Anki Study ---
+async function startAnkiStudy() {
+  let cards = await dbGetByIndex('anki', 'unitId', currentUnit.id);
+  cards.sort((a, b) => a.order - b.order);
+  if (cards.length === 0) return;
+  ankiStudyCards = cards;
+  ankiStudyIndex = 0;
+  showScreen('anki-study');
+  showAnkiCard();
+}
+
+function showAnkiCard() {
+  if (ankiStudyCards.length === 0) return;
+  const c = ankiStudyCards[ankiStudyIndex];
+  const original = document.getElementById('anki-study-original');
+  const masksContainer = document.getElementById('anki-study-masks');
+  masksContainer.innerHTML = '';
+  original.src = c.originalImage;
+
+  function buildMasks() {
+    masksContainer.innerHTML = '';
+    const natW = original.naturalWidth;
+    const natH = original.naturalHeight;
+
+    if (c.maskRects && c.maskRects.length > 0 && natW > 0) {
+      // Individual rect masks
+      c.maskRects.forEach((r) => {
+        const div = document.createElement('div');
+        div.className = 'anki-study-mask-piece';
+        div.style.left = (r.x / natW * 100) + '%';
+        div.style.top = (r.y / natH * 100) + '%';
+        div.style.width = (r.w / natW * 100) + '%';
+        div.style.height = (r.h / natH * 100) + '%';
+        div.style.background = r.color;
+        div.onclick = (e) => {
+          e.stopPropagation();
+          div.style.opacity = div.style.opacity === '0' ? '1' : '0';
+        };
+        masksContainer.appendChild(div);
+      });
+      // Pen mask overlay (if exists)
+      if (c.penMaskImage) {
+        const penImg = document.createElement('img');
+        penImg.src = c.penMaskImage;
+        penImg.className = 'anki-study-mask-pen';
+        penImg.onclick = (e) => {
+          e.stopPropagation();
+          penImg.style.opacity = penImg.style.opacity === '0' ? '1' : '0';
+        };
+        masksContainer.appendChild(penImg);
+      }
+    } else if (c.maskImage) {
+      // Backward compat: single mask image toggle
+      const maskImg = document.createElement('img');
+      maskImg.src = c.maskImage;
+      maskImg.className = 'anki-study-mask-pen';
+      maskImg.onclick = (e) => {
+        e.stopPropagation();
+        maskImg.style.opacity = maskImg.style.opacity === '0' ? '1' : '0';
+      };
+      masksContainer.appendChild(maskImg);
+    }
+  }
+
+  if (original.complete && original.naturalWidth > 0) {
+    buildMasks();
+  } else {
+    original.onload = buildMasks;
+  }
+
+  document.getElementById('anki-progress-fill').style.width = ((ankiStudyIndex + 1) / ankiStudyCards.length * 100) + '%';
+  document.getElementById('anki-progress-text').textContent = `${ankiStudyIndex + 1} / ${ankiStudyCards.length}`;
+}
+
+function nextAnkiCard() {
+  if (ankiStudyIndex < ankiStudyCards.length - 1) {
+    ankiStudyIndex++;
+    showAnkiCard();
+  }
+}
+
+function prevAnkiCard() {
+  if (ankiStudyIndex > 0) {
+    ankiStudyIndex--;
+    showAnkiCard();
+  }
+}
+
+function endAnkiStudy() {
+  showScreen('problems');
+  setUnitMode('anki');
 }
 
 // ==================== UI Helpers ====================
